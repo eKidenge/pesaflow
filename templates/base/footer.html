@@ -1,0 +1,38 @@
+<footer class="bg-white border-top mt-5">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="text-primary">PesaFlow</h5>
+                <p class="text-muted">Simplifying payments for businesses across Africa.</p>
+                <div class="social-icons">
+                    <a href="#" class="text-dark me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-dark me-3"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-dark me-3"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="text-dark"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h6>Quick Links</h6>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'dashboard' %}" class="text-muted">Dashboard</a></li>
+                    <li><a href="{% url 'payments_list' %}" class="text-muted">Payments</a></li>
+                    <li><a href="{% url 'customers_list' %}" class="text-muted">Customers</a></li>
+                    <li><a href="#" class="text-muted">Documentation</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h6>Legal</h6>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-muted">Privacy Policy</a></li>
+                    <li><a href="#" class="text-muted">Terms of Service</a></li>
+                    <li><a href="#" class="text-muted">Cookie Policy</a></li>
+                    <li><a href="#" class="text-muted">GDPR</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <div class="text-center text-muted">
+            <p>&copy; {% now "Y" %} PesaFlow. All rights reserved.</p>
+        </div>
+    </div>
+</footer>

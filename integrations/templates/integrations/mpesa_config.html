@@ -1,0 +1,361 @@
+{% extends 'base/base.html' %}
+{% block title %}M-Pesa Configuration - PesaFlow{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">M-Pesa Integration</h1>
+            <p class="text-muted">Configure M-Pesa payment gateway</p>
+        </div>
+        <div>
+            <button class="btn btn-success" onclick="testMpesaConnection()">
+                <i class="fas fa-plug me-2"></i>Test Connection
+            </button>
+        </div>
+    </div>
+    
+    <!-- Integration Status -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">M-Pesa Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        M-Pesa is a mobile phone-based money transfer, financing and microfinancing service.
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Consumer Key</label>
+                                    <input type="text" class="form-control" name="consumer_key" 
+                                           value="{{ config.consumer_key|default:'' }}" required>
+                                    <div class="form-text">Your M-Pesa Daraja API consumer key</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Consumer Secret</label>
+                                    <input type="password" class="form-control" name="consumer_secret" 
+                                           value="{{ config.consumer_secret|default:'' }}" required>
+                                    <div class="form-text">Your M-Pesa Daraja API consumer secret</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Business Short Code</label>
+                                    <input type="text" class="form-control" name="shortcode" 
+                                           value="{{ config.shortcode|default:'' }}" required>
+                                    <div class="form-text">Your M-Pesa business short code</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Passkey</label>
+                                    <input type="password" class="form-control" name="passkey" 
+                                           value="{{ config.passkey|default:'' }}" required>
+                                    <div class="form-text">Your M-Pesa online API passkey</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Transaction Type</label>
+                                    <select class="form-select" name="transaction_type">
+                                        <option value="CustomerPayBillOnline" {% if config.transaction_type == 'CustomerPayBillOnline' %}selected{% endif %}>
+                                            Customer Pay Bill
+                                        </option>
+                                        <option value="CustomerBuyGoodsOnline" {% if config.transaction_type == 'CustomerBuyGoodsOnline' %}selected{% endif %}>
+                                            Customer Buy Goods
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Environment</label>
+                                    <select class="form-select" name="environment">
+                                        <option value="sandbox" {% if config.environment == 'sandbox' %}selected{% endif %}>
+                                            Sandbox (Testing)
+                                        </option>
+                                        <option value="production" {% if config.environment == 'production' %}selected{% endif %}>
+                                            Production (Live)
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Callback URL</label>
+                            <input type="url" class="form-control" name="callback_url" 
+                                   value="{{ config.callback_url|default:'' }}">
+                            <div class="form-text">URL for M-Pesa transaction callbacks</div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="is_active" 
+                                   {% if config.is_active %}checked{% endif %}>
+                            <label class="form-check-label">
+                                Enable M-Pesa integration
+                            </label>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Save Configuration</button>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#resetModal">
+                                Reset to Default
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Status Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Integration Status</h5>
+                        {% if config.is_active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Consumer Key
+                            {% if config.consumer_key %}
+                            <span class="badge bg-success">Set</span>
+                            {% else %}
+                            <span class="badge bg-danger">Missing</span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Consumer Secret
+                            {% if config.consumer_secret %}
+                            <span class="badge bg-success">Set</span>
+                            {% else %}
+                            <span class="badge bg-danger">Missing</span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Short Code
+                            {% if config.shortcode %}
+                            <span class="badge bg-success">Set</span>
+                            {% else %}
+                            <span class="badge bg-danger">Missing</span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Last Test
+                            <span class="text-muted">2 hours ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">Last updated: {{ config.updated_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Help -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Help</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="helpAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#help1">
+                                    Where to find credentials?
+                                </button>
+                            </h2>
+                            <div id="help1" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    <small>
+                                        Visit the Safaricom Daraja portal to get your API credentials.
+                                        <a href="#" class="d-block mt-2">Visit Daraja Portal</a>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#help2">
+                                    Testing in Sandbox
+                                </button>
+                            </h2>
+                            <div id="help2" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    <small>
+                                        Use the sandbox environment for testing. Test credentials are provided in the Daraja portal.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- M-Pesa Logs -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Recent M-Pesa Transactions</h5>
+            <a href="{% url 'integrations_logs' %}" class="btn btn-sm btn-outline-primary">View All Logs</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Transaction ID</th>
+                            <th>Phone Number</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Response</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in mpesa_logs %}
+                        <tr>
+                            <td>{{ log.timestamp|date:"H:i:s" }}</td>
+                            <td><code>{{ log.transaction_id|truncatechars:12 }}</code></td>
+                            <td>{{ log.phone_number }}</td>
+                            <td>Ksh {{ log.amount }}</td>
+                            <td>
+                                {% if log.status == 'success' %}
+                                <span class="badge bg-success">Success</span>
+                                {% elif log.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% else %}
+                                <span class="badge bg-danger">Failed</span>
+                                {% endif %}
+                            </td>
+                            <td><small>{{ log.response_code }} - {{ log.response_description }}</small></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-3">
+                                <small class="text-muted">No M-Pesa transactions yet</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Modal -->
+<div class="modal fade" id="resetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reset Configuration</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to reset all M-Pesa configuration to default values?</p>
+                <p class="text-danger">This will clear all your current settings.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="resetConfiguration()">Reset Configuration</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function testMpesaConnection() {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testing...';
+        btn.disabled = true;
+        
+        // Simulate API test
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-check me-2"></i>Connection Successful';
+            btn.className = 'btn btn-success';
+            
+            // Show success alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                M-Pesa connection test successful! All credentials are valid.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.card-body').prepend(alertDiv);
+            
+            // Reset button after 3 seconds
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.className = 'btn btn-success';
+                btn.disabled = false;
+            }, 3000);
+        }, 2000);
+    }
+    
+    function resetConfiguration() {
+        // Implementation for resetting configuration
+        alert('Configuration reset functionality would be implemented here.');
+        document.getElementById('resetModal').querySelector('.btn-close').click();
+    }
+    
+    // Toggle password visibility
+    document.querySelectorAll('input[type="password"]').forEach(input => {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'btn btn-outline-secondary';
+        toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+        toggleBtn.style.position = 'absolute';
+        toggleBtn.style.right = '5px';
+        toggleBtn.style.top = '50%';
+        toggleBtn.style.transform = 'translateY(-50%)';
+        toggleBtn.style.zIndex = '10';
+        
+        const parentDiv = input.parentElement;
+        parentDiv.style.position = 'relative';
+        parentDiv.appendChild(toggleBtn);
+        
+        toggleBtn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

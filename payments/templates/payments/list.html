@@ -1,0 +1,325 @@
+{% extends 'base/base.html' %}
+{% block title %}Payments - PesaFlow{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Payments</h1>
+            <p class="text-muted">View and manage all payments</p>
+        </div>
+        <div>
+            <a href="{% url 'payments_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Payment
+            </a>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted">Total Revenue</h6>
+                            <h3 class="mb-0">Ksh 124,580</h3>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-primary rounded-circle">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted">Successful</h6>
+                            <h3 class="mb-0">142</h3>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-success rounded-circle">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted">Pending</h6>
+                            <h3 class="mb-0">8</h3>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-warning rounded-circle">
+                                <i class="fas fa-clock"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted">Failed</h6>
+                            <h3 class="mb-0">3</h3>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-danger rounded-circle">
+                                <i class="fas fa-times-circle"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" class="form-control" placeholder="Search payments...">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select">
+                        <option value="">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select">
+                        <option value="">All Methods</option>
+                        <option value="mpesa">M-Pesa</option>
+                        <option value="card">Card</option>
+                        <option value="bank">Bank Transfer</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" placeholder="From date">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" placeholder="To date">
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-primary w-100">Filter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payments Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Recent Payments</h5>
+            <div class="d-flex align-items-center">
+                <span class="me-3">Showing 1-15 of {{ payments|length }} payments</span>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-download me-2"></i>Export
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">CSV</a></li>
+                        <li><a class="dropdown-item" href="#">Excel</a></li>
+                        <li><a class="dropdown-item" href="#">PDF</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>
+                                <code>{{ payment.transaction_id }}</code>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar me-3">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; font-size: 12px;">
+                                            {{ payment.customer.name|slice:":1"|upper }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ payment.customer.name }}</h6>
+                                        <small class="text-muted">{{ payment.customer.phone }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ payment.created_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <h6 class="mb-0 text-success">Ksh {{ payment.amount|floatformat:0 }}</h6>
+                            </td>
+                            <td>
+                                {% if payment.method == 'mpesa' %}
+                                <span class="badge bg-success">M-Pesa</span>
+                                {% elif payment.method == 'card' %}
+                                <span class="badge bg-info">Card</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ payment.method|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if payment.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                                {% elif payment.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% elif payment.status == 'failed' %}
+                                <span class="badge bg-danger">Failed</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'payments_detail' payment.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if payment.status == 'pending' %}
+                                    <a href="#" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="copyToClipboard('{{ payment.transaction_id }}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="py-5">
+                                    <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                                    <h5>No payments found</h5>
+                                    <p class="text-muted">Create your first payment to get started</p>
+                                    <a href="{% url 'payments_create' %}" class="btn btn-primary">Create Payment</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- Payment Methods Distribution -->
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Payment Methods Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="paymentMethodsChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'payments_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Payment
+                        </a>
+                        <a href="{% url 'initiate_mpesa' %}" class="btn btn-success">
+                            <i class="fas fa-mobile-alt me-2"></i>M-Pesa Payment
+                        </a>
+                        <a href="{% url 'invoices_create' %}" class="btn btn-info">
+                            <i class="fas fa-file-invoice me-2"></i>Create Invoice
+                        </a>
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh Payments
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Copy transaction ID
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Transaction ID copied to clipboard!');
+        });
+    }
+    
+    // Payment Methods Chart
+    const paymentCtx = document.getElementById('paymentMethodsChart').getContext('2d');
+    const paymentChart = new Chart(paymentCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['M-Pesa', 'Credit Card', 'Bank Transfer', 'Cash'],
+            datasets: [{
+                data: [65, 20, 10, 5],
+                backgroundColor: [
+                    '#4361ee',
+                    '#4cc9f0',
+                    '#7209b7',
+                    '#f8961e'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,684 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}My Dashboard | PesaFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Customer Dashboard Styles */
+    .customer-dashboard {
+        padding: 20px;
+    }
+    
+    .customer-header {
+        background: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(76, 201, 240, 0.2);
+    }
+    
+    .customer-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .summary-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .summary-card:hover {
+        transform: translateY(-3px);
+        border-color: #4cc9f0;
+    }
+    
+    .summary-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 1.5rem;
+        color: white;
+        background: linear-gradient(135deg, #4cc9f0, #4895ef);
+    }
+    
+    .summary-value {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+    }
+    
+    .summary-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    /* Recent Activity */
+    .recent-activity {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+    
+    .activity-timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .activity-timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 25px;
+    }
+    
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -30px;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid;
+        z-index: 1;
+    }
+    
+    .timeline-marker.payment {
+        border-color: #38b000;
+    }
+    
+    .timeline-marker.invoice {
+        border-color: #4361ee;
+    }
+    
+    .timeline-marker.refund {
+        border-color: #f8961e;
+    }
+    
+    .timeline-content {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+    }
+    
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .timeline-title {
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .timeline-amount {
+        font-weight: 700;
+    }
+    
+    .timeline-details {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .timeline-time {
+        font-size: 0.85rem;
+        color: #adb5bd;
+    }
+    
+    /* Payment Methods */
+    .payment-methods {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+    
+    .method-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .method-card {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .method-card:hover {
+        border-color: #4cc9f0;
+        transform: translateY(-2px);
+    }
+    
+    .method-card.active {
+        border-color: #4cc9f0;
+        background: rgba(76, 201, 240, 0.05);
+    }
+    
+    .method-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .method-icon.mpesa {
+        background: linear-gradient(135deg, #4cc9f0, #4895ef);
+    }
+    
+    .method-icon.card {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    }
+    
+    .method-icon.bank {
+        background: linear-gradient(135deg, #7209b7, #b5179e);
+    }
+    
+    .method-info h6 {
+        margin-bottom: 5px;
+    }
+    
+    .method-info p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    /* Quick Actions */
+    .customer-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .action-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-5px);
+        border-color: #4cc9f0;
+        box-shadow: 0 10px 25px rgba(76, 201, 240, 0.1);
+    }
+    
+    .action-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 1.5rem;
+        color: white;
+        background: linear-gradient(135deg, #4cc9f0, #4895ef);
+    }
+    
+    /* Invoices Section */
+    .invoices-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+    
+    .invoices-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .invoice-card {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .invoice-card:hover {
+        border-color: #4cc9f0;
+        transform: translateY(-2px);
+    }
+    
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .invoice-id {
+        font-weight: 600;
+        color: #4361ee;
+    }
+    
+    .invoice-status {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-paid {
+        background: rgba(56, 176, 0, 0.1);
+        color: #38b000;
+    }
+    
+    .status-pending {
+        background: rgba(248, 150, 30, 0.1);
+        color: #f8961e;
+    }
+    
+    .status-overdue {
+        background: rgba(247, 37, 133, 0.1);
+        color: #f72585;
+    }
+    
+    .invoice-details {
+        margin-bottom: 15px;
+    }
+    
+    .invoice-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    
+    .invoice-date {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    /* Spending Chart */
+    .spending-chart {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .customer-summary {
+            grid-template-columns: 1fr;
+        }
+        
+        .customer-actions {
+            grid-template-columns: 1fr;
+        }
+        
+        .invoices-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .method-list {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="customer-dashboard">
+    <!-- Customer Header -->
+    <div class="customer-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-6 mb-2">Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
+                <p class="mb-0">Here's your personal payment dashboard and transaction history.</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-light" onclick="window.location.href='{% url 'payments_create' %}'">
+                    <i class="fas fa-plus me-2"></i>Make Payment
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="customer-summary">
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="summary-value">${{ total_spent|default:"0.00"|floatformat:2 }}</div>
+            <div class="summary-label">Total Spent</div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+            <div class="summary-value">{{ total_invoices|default:"0" }}</div>
+            <div class="summary-label">Total Invoices</div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="summary-value">{{ completed_payments|default:"0" }}</div>
+            <div class="summary-label">Completed Payments</div>
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="summary-value">{{ pending_payments|default:"0" }}</div>
+            <div class="summary-label">Pending Payments</div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity Timeline -->
+    <div class="recent-activity">
+        <h5 class="mb-4">Recent Activity</h5>
+        <div class="activity-timeline">
+            {% for activity in recent_activity %}
+            <div class="timeline-item">
+                <div class="timeline-marker {{ activity.type }}"></div>
+                <div class="timeline-content">
+                    <div class="timeline-header">
+                        <h6 class="timeline-title">{{ activity.title }}</h6>
+                        <span class="timeline-amount">${{ activity.amount }}</span>
+                    </div>
+                    <div class="timeline-details">{{ activity.description }}</div>
+                    <div class="timeline-time">
+                        <i class="far fa-clock me-1"></i>{{ activity.time_ago }}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-4">
+                <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No recent activity</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Payment Methods -->
+    <div class="payment-methods">
+        <h5 class="mb-4">Payment Methods</h5>
+        <div class="method-list">
+            <div class="method-card active">
+                <div class="method-icon mpesa">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="method-info">
+                    <h6 class="mb-1">M-Pesa</h6>
+                    <p>{{ request.user.profile.phone|default:"+254 XXX XXX XXX" }}</p>
+                </div>
+            </div>
+            
+            <div class="method-card">
+                <div class="method-icon card">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="method-info">
+                    <h6 class="mb-1">Credit Card</h6>
+                    <p>**** **** **** 4242</p>
+                </div>
+            </div>
+            
+            <div class="method-card">
+                <div class="method-icon bank">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="method-info">
+                    <h6 class="mb-1">Bank Transfer</h6>
+                    <p>Account ending in 7890</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="customer-actions">
+        <div class="action-card" onclick="window.location.href='{% url 'payments_create' %}'">
+            <div class="action-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <h5>Make Payment</h5>
+            <p class="text-muted">Pay invoice or send money</p>
+        </div>
+        
+        <div class="action-card" onclick="window.location.href='{% url 'invoices_list' %}'">
+            <div class="action-icon">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+            <h5>View Invoices</h5>
+            <p class="text-muted">Check your invoices</p>
+        </div>
+        
+        <div class="action-card" onclick="window.location.href='{% url 'payments_list' %}'">
+            <div class="action-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <h5>Transaction History</h5>
+            <p class="text-muted">View all transactions</p>
+        </div>
+        
+        <div class="action-card" onclick="window.location.href='{% url 'profile' %}'">
+            <div class="action-icon">
+                <i class="fas fa-user-cog"></i>
+            </div>
+            <h5>Profile Settings</h5>
+            <p class="text-muted">Update your information</p>
+        </div>
+    </div>
+    
+    <!-- Recent Invoices -->
+    <div class="invoices-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">Recent Invoices</h5>
+            <a href="{% url 'invoices_list' %}" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        
+        <div class="invoices-grid">
+            {% for invoice in recent_invoices %}
+            <div class="invoice-card">
+                <div class="invoice-header">
+                    <span class="invoice-id">INV-{{ invoice.id|stringformat:"05d" }}</span>
+                    <span class="invoice-status status-{{ invoice.status }}">{{ invoice.status|title }}</span>
+                </div>
+                <div class="invoice-details">
+                    <div class="invoice-amount">${{ invoice.amount|floatformat:2 }}</div>
+                    <div class="invoice-date">Due: {{ invoice.due_date|date:"M d, Y" }}</div>
+                    <p class="mb-0 mt-2">{{ invoice.description|default:"No description" }}</p>
+                </div>
+                <div class="invoice-actions">
+                    {% if invoice.status == 'pending' %}
+                    <button class="btn btn-sm btn-primary w-100" onclick="payInvoice({{ invoice.id }})">
+                        <i class="fas fa-credit-card me-2"></i>Pay Now
+                    </button>
+                    {% else %}
+                    <button class="btn btn-sm btn-outline-primary w-100">
+                        <i class="fas fa-download me-2"></i>Download
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4">
+                <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No invoices found</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Spending Overview -->
+    <div class="spending-chart">
+        <h5 class="mb-4">Spending Overview</h5>
+        <canvas id="spendingChart" height="200"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Spending Chart
+        const spendingCtx = document.getElementById('spendingChart').getContext('2d');
+        const spendingChart = new Chart(spendingCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    label: 'Spending ($)',
+                    data: [450, 520, 480, 620, 580, 750, 820],
+                    borderColor: '#4cc9f0',
+                    backgroundColor: 'rgba(76, 201, 240, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `$${context.parsed.y}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Pay invoice function
+        window.payInvoice = function(invoiceId) {
+            // Show payment modal
+            const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            modal.show();
+            
+            // In real app, this would load invoice details and initiate payment
+            console.log(`Paying invoice ${invoiceId}`);
+        };
+        
+        // Payment method selection
+        document.querySelectorAll('.method-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.method-card').forEach(c => {
+                    c.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Auto-refresh dashboard every 60 seconds
+        setInterval(() => {
+            console.log('Refreshing customer dashboard...');
+            // In real app, fetch new data from API
+        }, 60000);
+    });
+</script>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Make Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-credit-card fa-3x text-primary mb-3"></i>
+                    <h4>Confirm Payment</h4>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You will be redirected to the payment gateway to complete this transaction.
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Payment Method</label>
+                    <select class="form-select">
+                        <option value="mpesa">M-Pesa</option>
+                        <option value="card">Credit/Debit Card</option>
+                        <option value="bank">Bank Transfer</option>
+                    </select>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-lock me-2"></i>Proceed to Secure Payment
+                    </button>
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

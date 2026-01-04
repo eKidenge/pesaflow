@@ -1,0 +1,998 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Register - Choose Your Role | PesaFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --business-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        --client-gradient: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
+        --admin-gradient: linear-gradient(135deg, #7209b7 0%, #b5179e 100%);
+    }
+    
+    .register-hero {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 80px 0 40px 0;
+    }
+    
+    .register-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .register-sidebar {
+        background: var(--business-gradient);
+        color: white;
+        padding: 60px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .register-sidebar::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 30px 30px;
+        opacity: 0.3;
+        animation: float 20s linear infinite;
+    }
+    
+    @keyframes float {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .register-content {
+        padding: 60px 40px;
+    }
+    
+    .brand-display {
+        margin-bottom: 40px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .brand-display .logo-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .brand-display h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+    }
+    
+    /* Registration Form Styles */
+    .registration-form {
+        animation: fadeIn 0.5s ease;
+    }
+    
+    .form-section-title {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f8f9fa;
+    }
+    
+    .form-section-title h3 {
+        font-weight: 700;
+        color: var(--dark-color);
+    }
+    
+    /* Role-specific form sections */
+    .role-section {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    .role-section.active {
+        display: block;
+    }
+    
+    /* Form styling */
+    .form-group-enhanced {
+        margin-bottom: 25px;
+        position: relative;
+    }
+    
+    .form-group-enhanced label {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .form-group-enhanced .required {
+        color: #f72585;
+    }
+    
+    .input-with-icon {
+        position: relative;
+    }
+    
+    .input-with-icon i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 2;
+    }
+    
+    .input-with-icon input,
+    .input-with-icon select,
+    .input-with-icon textarea {
+        padding-left: 45px;
+    }
+    
+    /* Role Selection Cards */
+    .role-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+    
+    .role-card {
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .role-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .role-card.selected {
+        border-color: var(--primary-color);
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(58, 12, 163, 0.05));
+    }
+    
+    .role-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2rem;
+        color: white;
+    }
+    
+    .role-card[data-role="admin"] .role-icon {
+        background: var(--admin-gradient);
+    }
+    
+    .role-card[data-role="business"] .role-icon {
+        background: var(--business-gradient);
+    }
+    
+    .role-card[data-role="client"] .role-icon {
+        background: var(--client-gradient);
+    }
+    
+    .role-card h4 {
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .selected-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: var(--primary-color);
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.3s ease;
+    }
+    
+    .role-card.selected .selected-badge {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    /* Form footer */
+    .form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .terms-checkbox {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .terms-checkbox label {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .terms-checkbox a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .login-link {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .login-link a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    
+    /* Password strength */
+    .password-strength {
+        margin-top: 10px;
+    }
+    
+    .strength-meter {
+        height: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+    
+    .strength-fill {
+        height: 100%;
+        width: 0%;
+        background: #dc3545;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+    
+    .strength-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .register-sidebar {
+            padding: 40px 20px;
+        }
+        
+        .register-content {
+            padding: 40px 20px;
+        }
+        
+        .brand-display h1 {
+            font-size: 2rem;
+        }
+        
+        .role-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="register-card">
+                    <div class="row g-0">
+                        <!-- Left Sidebar -->
+                        <div class="col-lg-5">
+                            <div class="register-sidebar">
+                                <div class="brand-display">
+                                    <div class="logo-icon">
+                                        <i class="fas fa-money-bill-wave fa-2x"></i>
+                                    </div>
+                                    <h1>PesaFlow</h1>
+                                    <p class="brand-tagline">Join Africa's leading payment management platform trusted by thousands of businesses.</p>
+                                </div>
+                                
+                                <div class="features-list">
+                                    <h5 class="mb-3">Why Choose PesaFlow?</h5>
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="fas fa-shield-alt me-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Enterprise Security</h6>
+                                            <p class="small mb-0">Bank-level encryption and compliance</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="fas fa-bolt me-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Instant Processing</h6>
+                                            <p class="small mb-0">Real-time payment processing</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="fas fa-chart-line me-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Smart Analytics</h6>
+                                            <p class="small mb-0">Comprehensive business insights</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start">
+                                        <i class="fas fa-headset me-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">24/7 Support</h6>
+                                            <p class="small mb-0">Dedicated customer support</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Content -->
+                        <div class="col-lg-7">
+                            <div class="register-content">
+                                <div class="registration-form">
+                                    <div class="form-section-title">
+                                        <h3>Create Your Account</h3>
+                                        <p class="text-muted mb-0">Select your account type and fill in your details</p>
+                                    </div>
+                                    
+                                    <!-- Role Selection -->
+                                    <div class="mb-4">
+                                        <label class="form-label">Select Account Type <span class="required">*</span></label>
+                                        <div class="role-cards">
+                                            <!-- Admin Account -->
+                                            <div class="role-card selected" data-role="admin">
+                                                <div class="selected-badge">
+                                                    <i class="fas fa-check"></i>
+                                                </div>
+                                                <div class="role-icon">
+                                                    <i class="fas fa-crown"></i>
+                                                </div>
+                                                <h4>System Administrator</h4>
+                                                <p>For platform administrators who manage organizations and system settings.</p>
+                                                <div class="mt-3">
+                                                    <small class="text-primary d-block">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Access all organizations
+                                                    </small>
+                                                    <small class="text-primary d-block">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        System configuration
+                                                    </small>
+                                                    <small class="text-primary d-block">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        User management
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Business Account -->
+                                            <div class="role-card" data-role="business">
+                                                <div class="selected-badge">
+                                                    <i class="fas fa-check"></i>
+                                                </div>
+                                                <div class="role-icon">
+                                                    <i class="fas fa-building"></i>
+                                                </div>
+                                                <h4>Business Account</h4>
+                                                <p>For companies and organizations that process payments and manage customers.</p>
+                                                <div class="mt-3">
+                                                    <small class="text-primary d-block">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Payment processing
+                                                    </small>
+                                                    <small class="text-primary d-block">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Customer management
+                                                    </small>
+                                                    <small class="text-primary d-block">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Analytics & reporting
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Client Account -->
+                                            <div class="role-card" data-role="client">
+                                                <div class="selected-badge">
+                                                    <i class="fas fa-check"></i>
+                                                </div>
+                                                <div class="role-icon">
+                                                    <i class="fas fa-user-tie"></i>
+                                                </div>
+                                                <h4>Client Account</h4>
+                                                <p>For individuals who make payments and manage their transaction history.</p>
+                                                <div class="mt-3">
+                                                    <small class="text-primary d-block">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Make payments
+                                                    </small>
+                                                    <small class="text-primary d-block">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        View invoices
+                                                    </small>
+                                                    <small class="text-primary d-block">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Transaction history
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Registration Form -->
+                                    <form method="post" id="registrationForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="role" id="selectedRole" value="admin">
+                                        
+                                        <!-- Common Fields -->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group-enhanced">
+                                                    <label>First Name <span class="required">*</span></label>
+                                                    <div class="input-with-icon">
+                                                        <i class="fas fa-user"></i>
+                                                        <input type="text" class="form-control" name="first_name" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group-enhanced">
+                                                    <label>Last Name <span class="required">*</span></label>
+                                                    <div class="input-with-icon">
+                                                        <i class="fas fa-user"></i>
+                                                        <input type="text" class="form-control" name="last_name" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group-enhanced">
+                                            <label>Email Address <span class="required">*</span></label>
+                                            <div class="input-with-icon">
+                                                <i class="fas fa-envelope"></i>
+                                                <input type="email" class="form-control" name="email" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group-enhanced">
+                                                    <label>Phone Number <span class="required">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">+254</span>
+                                                        <input type="tel" class="form-control" name="phone" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group-enhanced">
+                                                    <label>Country <span class="required">*</span></label>
+                                                    <select class="form-select" name="country" required>
+                                                        <option value="">Select country</option>
+                                                        <option value="KE">Kenya</option>
+                                                        <option value="TZ">Tanzania</option>
+                                                        <option value="UG">Uganda</option>
+                                                        <option value="RW">Rwanda</option>
+                                                        <option value="NG">Nigeria</option>
+                                                        <option value="GH">Ghana</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Role-specific fields -->
+                                        <div class="role-section active" id="adminFields">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-shield-alt me-2"></i>
+                                                Admin accounts require special authorization. Please contact support if you need admin access.
+                                            </div>
+                                            <div class="form-group-enhanced">
+                                                <label>Admin Key (Optional)</label>
+                                                <div class="input-with-icon">
+                                                    <i class="fas fa-key"></i>
+                                                    <input type="text" class="form-control" name="admin_key" placeholder="Enter admin authorization key">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="role-section" id="businessFields">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group-enhanced">
+                                                        <label>Business Name <span class="required">*</span></label>
+                                                        <div class="input-with-icon">
+                                                            <i class="fas fa-building"></i>
+                                                            <input type="text" class="form-control" name="business_name">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group-enhanced">
+                                                        <label>Business Type <span class="required">*</span></label>
+                                                        <select class="form-select" name="business_type">
+                                                            <option value="">Select type</option>
+                                                            <option value="sole_proprietor">Sole Proprietor</option>
+                                                            <option value="partnership">Partnership</option>
+                                                            <option value="llc">Limited Liability Company</option>
+                                                            <option value="corporation">Corporation</option>
+                                                            <option value="non_profit">Non-Profit Organization</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group-enhanced">
+                                                <label>Business Address</label>
+                                                <textarea class="form-control" name="business_address" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="role-section" id="clientFields">
+                                            <div class="form-group-enhanced">
+                                                <label>ID/Passport Number</label>
+                                                <div class="input-with-icon">
+                                                    <i class="fas fa-id-card"></i>
+                                                    <input type="text" class="form-control" name="id_number">
+                                                </div>
+                                            </div>
+                                            <div class="form-group-enhanced">
+                                                <label>Physical Address</label>
+                                                <textarea class="form-control" name="address" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Password Fields -->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group-enhanced">
+                                                    <label>Password <span class="required">*</span></label>
+                                                    <div class="input-with-icon">
+                                                        <i class="fas fa-lock"></i>
+                                                        <input type="password" class="form-control" id="password" name="password" required>
+                                                    </div>
+                                                    <div class="password-strength">
+                                                        <div class="strength-meter">
+                                                            <div class="strength-fill" id="strengthFill"></div>
+                                                        </div>
+                                                        <div class="strength-text" id="strengthText">Password strength</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group-enhanced">
+                                                    <label>Confirm Password <span class="required">*</span></label>
+                                                    <div class="input-with-icon">
+                                                        <i class="fas fa-lock"></i>
+                                                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+                                                    </div>
+                                                    <div class="form-text" id="passwordMatch"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Terms and Conditions -->
+                                        <div class="terms-checkbox">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                                <label class="form-check-label" for="terms">
+                                                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="terms-checkbox">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="marketing">
+                                                <label class="form-check-label" for="marketing">
+                                                    I want to receive marketing emails about new features and updates
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Submit Button -->
+                                        <div class="form-footer">
+                                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                                <i class="fas fa-user-plus me-2"></i>
+                                                Create <span id="submitRoleText">Admin</span> Account
+                                            </button>
+                                        </div>
+                                    </form>
+                                    
+                                    <!-- Login Link -->
+                                    <div class="login-link">
+                                        <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Redirect Notification -->
+<div class="redirect-notification" id="redirectNotification">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-spinner fa-spin me-3 text-primary"></i>
+        <div>
+            <h6 class="mb-1">Creating <span id="creatingAccountType">Admin</span> Account</h6>
+            <small class="text-muted">Please wait while we set up your account...</small>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Terms of Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Terms and conditions content here...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Privacy Policy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Privacy policy content here...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let selectedRole = 'admin';
+        
+        // Role Selection
+        const roleCards = document.querySelectorAll('.role-card');
+        const selectedRoleInput = document.getElementById('selectedRole');
+        const submitRoleText = document.getElementById('submitRoleText');
+        const creatingAccountType = document.getElementById('creatingAccountType');
+        const roleSections = document.querySelectorAll('.role-section');
+        
+        // Password elements
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        const passwordMatch = document.getElementById('passwordMatch');
+        
+        // Form
+        const registrationForm = document.getElementById('registrationForm');
+        const redirectNotification = document.getElementById('redirectNotification');
+        
+        // Role selection logic
+        roleCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selected class from all cards
+                roleCards.forEach(c => c.classList.remove('selected'));
+                
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                
+                // Update selected role
+                selectedRole = this.dataset.role;
+                selectedRoleInput.value = selectedRole;
+                
+                // Update UI text
+                const roleText = this.querySelector('h4').textContent;
+                submitRoleText.textContent = roleText.replace(' Account', '').replace('System ', '');
+                creatingAccountType.textContent = roleText;
+                
+                // Show appropriate role fields
+                roleSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(`${selectedRole}Fields`).classList.add('active');
+                
+                // Update required fields based on role
+                updateRequiredFields();
+            });
+        });
+        
+        // Update required fields based on role
+        function updateRequiredFields() {
+            // Reset all
+            document.querySelectorAll('input, select').forEach(field => {
+                const label = field.closest('.form-group-enhanced')?.querySelector('label');
+                if (label) {
+                    const requiredSpan = label.querySelector('.required');
+                    if (requiredSpan) {
+                        requiredSpan.remove();
+                    }
+                }
+            });
+            
+            // Common required fields
+            const commonRequired = ['first_name', 'last_name', 'email', 'phone', 'country', 'password', 'confirm_password'];
+            
+            // Role-specific required fields
+            const roleRequired = {
+                admin: [],
+                business: ['business_name', 'business_type'],
+                client: []
+            };
+            
+            // Mark common fields as required
+            commonRequired.forEach(fieldName => {
+                const field = document.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    field.required = true;
+                    const label = field.closest('.form-group-enhanced')?.querySelector('label');
+                    if (label && !label.querySelector('.required')) {
+                        label.innerHTML += ' <span class="required">*</span>';
+                    }
+                }
+            });
+            
+            // Mark role-specific fields as required
+            if (roleRequired[selectedRole]) {
+                roleRequired[selectedRole].forEach(fieldName => {
+                    const field = document.querySelector(`[name="${fieldName}"]`);
+                    if (field) {
+                        field.required = true;
+                        const label = field.closest('.form-group-enhanced')?.querySelector('label');
+                        if (label && !label.querySelector('.required')) {
+                            label.innerHTML += ' <span class="required">*</span>';
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Password strength checker
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            let text = 'Password strength';
+            let color = '#dc3545';
+            
+            // Length check
+            if (password.length >= 8) strength += 25;
+            // Uppercase check
+            if (/[A-Z]/.test(password)) strength += 25;
+            // Number check
+            if (/[0-9]/.test(password)) strength += 25;
+            // Special character check
+            if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+            
+            // Determine strength level
+            if (strength >= 75) {
+                text = 'Strong password';
+                color = '#38b000';
+            } else if (strength >= 50) {
+                text = 'Medium password';
+                color = '#f8961e';
+            } else if (strength >= 25) {
+                text = 'Weak password';
+                color = '#dc3545';
+            } else {
+                text = 'Very weak password';
+                color = '#dc3545';
+            }
+            
+            // Update UI
+            strengthFill.style.width = `${strength}%`;
+            strengthFill.style.background = color;
+            strengthText.textContent = text;
+            strengthText.style.color = color;
+        });
+        
+        // Password confirmation check
+        confirmPasswordInput.addEventListener('input', function() {
+            if (this.value !== passwordInput.value) {
+                passwordMatch.textContent = 'Passwords do not match';
+                passwordMatch.style.color = '#dc3545';
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else {
+                passwordMatch.textContent = 'Passwords match';
+                passwordMatch.style.color = '#38b000';
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+        
+        // Form submission
+        registrationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating Account...';
+            submitBtn.disabled = true;
+            
+            // Show redirect notification
+            redirectNotification.style.display = 'block';
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // In real app, this would submit to Django backend
+                // For demo, we'll simulate success
+                
+                // Hide notification
+                redirectNotification.style.display = 'none';
+                
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                // Show success message
+                showSuccess(`Account created successfully! You will be redirected to login.`);
+                
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "{% url 'login' %}?role=" + selectedRole;
+                }, 2000);
+                
+            }, 3000);
+        });
+        
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            
+            // Check required fields
+            const requiredFields = registrationForm.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                    
+                    // Scroll to first error
+                    if (isValid === false) {
+                        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        isValid = null; // Prevent multiple scrolls
+                    }
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            // Check password match
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordInput.classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            // Check password strength
+            if (passwordInput.value.length < 8) {
+                passwordInput.classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            // Check terms acceptance
+            const termsCheckbox = document.getElementById('terms');
+            if (!termsCheckbox.checked) {
+                termsCheckbox.classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // Show success message
+        function showSuccess(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            registrationForm.prepend(alertDiv);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+        
+        // Initialize
+        updateRequiredFields();
+    });
+</script>
+
+<style>
+    .redirect-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border-radius: 10px;
+        padding: 15px 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        border-left: 4px solid var(--primary-color);
+        z-index: 9999;
+        display: none;
+        animation: slideInRight 0.5s ease;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+</style>
+{% endblock %}

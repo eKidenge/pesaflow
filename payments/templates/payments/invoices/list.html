@@ -1,0 +1,335 @@
+{% extends 'base/base.html' %}
+{% block title %}Invoices - PesaFlow{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Invoices</h1>
+            <p class="text-muted">Manage and track your invoices</p>
+        </div>
+        <div>
+            <a href="{% url 'invoices_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create Invoice
+            </a>
+        </div>
+    </div>
+    
+    <!-- Invoice Stats -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted">Total Invoices</h6>
+                            <h3 class="mb-0">45</h3>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-primary rounded-circle">
+                                <i class="fas fa-file-invoice"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted">Paid</h6>
+                            <h3 class="mb-0">32</h3>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-success rounded-circle">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted">Pending</h6>
+                            <h3 class="mb-0">8</h3>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-warning rounded-circle">
+                                <i class="fas fa-clock"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="text-muted">Overdue</h6>
+                            <h3 class="mb-0">5</h3>
+                        </div>
+                        <div class="avatar-sm">
+                            <span class="avatar-title bg-danger rounded-circle">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Invoice Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" class="form-control" placeholder="Search invoices...">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select">
+                        <option value="">All Status</option>
+                        <option value="paid">Paid</option>
+                        <option value="pending">Pending</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select">
+                        <option value="">All Customers</option>
+                        <option value="1">John Doe</option>
+                        <option value="2">Jane Smith</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" placeholder="From date">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" placeholder="To date">
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-primary w-100">Filter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Invoices Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">All Invoices</h5>
+            <div class="d-flex align-items-center">
+                <span class="me-3">Total Amount: Ksh 245,800</span>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-download me-2"></i>Export
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">CSV</a></li>
+                        <li><a class="dropdown-item" href="#">Excel</a></li>
+                        <li><a class="dropdown-item" href="#">PDF</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Due Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td>
+                                <strong>INV-{{ invoice.id|stringformat:"05d" }}</strong>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar me-3">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; font-size: 12px;">
+                                            {{ invoice.customer.name|slice:":1"|upper }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ invoice.customer.name }}</h6>
+                                        <small class="text-muted">{{ invoice.customer.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ invoice.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                {% if invoice.is_overdue %}
+                                <span class="text-danger">{{ invoice.due_date|date:"M d, Y" }}</span>
+                                {% else %}
+                                {{ invoice.due_date|date:"M d, Y" }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <h6 class="mb-0">Ksh {{ invoice.total_amount|floatformat:0 }}</h6>
+                            </td>
+                            <td>
+                                {% if invoice.status == 'paid' %}
+                                <span class="badge bg-success">Paid</span>
+                                {% elif invoice.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% elif invoice.status == 'overdue' %}
+                                <span class="badge bg-danger">Overdue</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Draft</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'invoices_detail' invoice.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                    {% if invoice.status == 'pending' %}
+                                    <a href="{% url 'invoices_send' invoice.id %}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </a>
+                                    {% endif %}
+                                    <a href="#" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="py-5">
+                                    <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+                                    <h5>No invoices found</h5>
+                                    <p class="text-muted">Create your first invoice to get started</p>
+                                    <a href="{% url 'invoices_create' %}" class="btn btn-primary">Create Invoice</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- Quick Invoice Actions -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Create Quick Invoice</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label">Select Customer</label>
+                            <select class="form-select">
+                                <option>Select a customer...</option>
+                                <option>John Doe</option>
+                                <option>Jane Smith</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Amount (Ksh)</label>
+                            <input type="number" class="form-control" placeholder="Enter amount">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" rows="2" placeholder="Enter description"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Create Invoice</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Invoice Status Overview</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="invoiceStatusChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Invoice Status Chart
+    const invoiceCtx = document.getElementById('invoiceStatusChart').getContext('2d');
+    const invoiceChart = new Chart(invoiceCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Paid',
+                data: [45000, 52000, 48000, 62000, 58000, 65000],
+                backgroundColor: '#4361ee'
+            }, {
+                label: 'Pending',
+                data: [12000, 15000, 18000, 14000, 16000, 20000],
+                backgroundColor: '#f8961e'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Ksh ' + (value / 1000) + 'k';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

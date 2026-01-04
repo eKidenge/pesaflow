@@ -1,0 +1,48 @@
+<div class="sidebar">
+    <div class="d-flex flex-column">
+        <a href="{% url 'dashboard' %}" class="{% if request.path == '/dashboard/' %}active{% endif %}">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            <span>Dashboard</span>
+        </a>
+        
+        <a href="{% url 'customers_list' %}" class="{% if 'customers' in request.path %}active{% endif %}">
+            <i class="fas fa-users me-2"></i>
+            <span>Customers</span>
+        </a>
+        
+        <a href="{% url 'payments_list' %}" class="{% if 'payments' in request.path %}active{% endif %}">
+            <i class="fas fa-credit-card me-2"></i>
+            <span>Payments</span>
+        </a>
+        
+        <a href="{% url 'invoices_list' %}" class="{% if 'invoices' in request.path %}active{% endif %}">
+            <i class="fas fa-file-invoice me-2"></i>
+            <span>Invoices</span>
+        </a>
+        
+        <a href="{% url 'notifications_templates_list' %}" class="{% if 'notifications' in request.path %}active{% endif %}">
+            <i class="fas fa-bell me-2"></i>
+            <span>Notifications</span>
+        </a>
+        
+        <a href="{% url 'integrations_list' %}" class="{% if 'integrations' in request.path %}active{% endif %}">
+            <i class="fas fa-plug me-2"></i>
+            <span>Integrations</span>
+        </a>
+        
+        <a href="{% url 'organizations_list' %}" class="{% if 'organizations' in request.path %}active{% endif %}">
+            <i class="fas fa-building me-2"></i>
+            <span>Organizations</span>
+        </a>
+        
+        <div class="mt-auto p-3">
+            <div class="card bg-dark text-white">
+                <div class="card-body p-3">
+                    <small class="d-block">Current Balance</small>
+                    <h4 class="mb-0">Ksh 45,820</h4>
+                    <a href="#" class="btn btn-sm btn-light mt-2 w-100">Withdraw</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

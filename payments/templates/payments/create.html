@@ -1,0 +1,181 @@
+{% extends 'base/base.html' %}
+{% block title %}Create Payment - PesaFlow{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Create New Payment</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Select Customer</label>
+                            <select class="form-select" name="customer_id" required>
+                                <option value="">Choose a customer...</option>
+                                {% for customer in customers %}
+                                <option value="{{ customer.id }}">{{ customer.name }} - {{ customer.email }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                <a href="{% url 'customers_create' %}">Add new customer</a>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Amount (Ksh)</label>
+                                    <input type="number" class="form-control" name="amount" 
+                                           placeholder="Enter amount" required min="1">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Payment Method</label>
+                                    <select class="form-select" name="payment_method" required>
+                                        <option value="mpesa">M-Pesa</option>
+                                        <option value="card">Credit/Debit Card</option>
+                                        <option value="bank">Bank Transfer</option>
+                                        <option value="cash">Cash</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3" 
+                                      placeholder="Enter payment description"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category">
+                                <option value="sales">Sales</option>
+                                <option value="service">Service</option>
+                                <option value="subscription">Subscription</option>
+                                <option value="donation">Donation</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Reference/Invoice Number (Optional)</label>
+                            <input type="text" class="form-control" name="reference" 
+                                   placeholder="e.g., INV-001">
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'payments_list' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Payment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Quick Customer Add -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Add Customer</h5>
+                </div>
+                <div class="card-body">
+                    <form id="quickCustomerForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control mb-2" placeholder="Full Name">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="email" class="form-control mb-2" placeholder="Email">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="tel" class="form-control mb-2" placeholder="Phone Number">
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-primary w-100">
+                                    Add & Select
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preview Sidebar -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Payment Preview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-money-bill-wave fa-3x text-primary mb-3"></i>
+                        <h4>Payment Summary</h4>
+                    </div>
+                    
+                    <div class="list-group list-group-flush mb-4">
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Amount:</span>
+                            <strong id="previewAmount">Ksh 0</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Processing Fee:</span>
+                            <span id="previewFee">Ksh 0</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Total:</span>
+                            <strong class="text-primary" id="previewTotal">Ksh 0</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="fas fa-info-circle me-2"></i>
+                            Payment will be processed immediately upon creation.
+                        </small>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-success" onclick="initiateMpesa()">
+                            <i class="fas fa-mobile-alt me-2"></i>Process via M-Pesa
+                        </button>
+                        <button type="button" class="btn btn-outline-primary">
+                            <i class="fas fa-link me-2"></i>Generate Payment Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Update preview based on amount input
+    document.querySelector('input[name="amount"]').addEventListener('input', function() {
+        const amount = parseFloat(this.value) || 0;
+        const fee = Math.max(amount * 0.015, 10); // 1.5% fee, min 10 Ksh
+        const total = amount + fee;
+        
+        document.getElementById('previewAmount').textContent = 'Ksh ' + amount.toLocaleString();
+        document.getElementById('previewFee').textContent = 'Ksh ' + fee.toFixed(2);
+        document.getElementById('previewTotal').textContent = 'Ksh ' + total.toLocaleString();
+    });
+    
+    function initiateMpesa() {
+        const amount = document.querySelector('input[name="amount"]').value;
+        if (!amount || amount < 1) {
+            alert('Please enter a valid amount first.');
+            return;
+        }
+        
+        window.location.href = "{% url 'initiate_mpesa' %}?amount=" + amount;
+    }
+</script>
+{% endblock %}
+{% endblock %}
