@@ -18,6 +18,9 @@ urlpatterns = [
     path('notifications/statistics/', views.NotificationViewSet.as_view({'get': 'statistics'}), name='notification_statistics'),
     path('notifications/my/', views.NotificationViewSet.as_view({'get': 'my_notifications'}), name='my_notifications'),
     
+    path('notifications/list/', views.NotificationViewSet.as_view({'get': 'list'}), name='notifications_list'),
+    # ADD THIS LINE:
+    path('templates/list/', views.NotificationTemplateViewSet.as_view({'get': 'list'}), name='notifications_templates_list'),
     # Template endpoints
     path('templates/<uuid:pk>/duplicate/', views.NotificationTemplateViewSet.as_view({'post': 'duplicate'}), name='duplicate_template'),
     path('templates/<uuid:pk>/test/', views.NotificationTemplateViewSet.as_view({'post': 'test'}), name='test_template'),

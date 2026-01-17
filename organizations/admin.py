@@ -7,13 +7,20 @@ from .models import Organization, OrganizationType, OrganizationMember
 
 @admin.register(OrganizationType)
 class OrganizationTypeAdmin(admin.ModelAdmin):
-    """Admin configuration for OrganizationType model"""
+    """Admin configuration for OrganizationType model - FIXED"""
     
-    list_display = ['name', 'provider', 'category', 'is_active']
-    list_filter = ['category', 'is_active']
+    list_display = ['name', 'icon', 'description_preview', 'is_active']
+    list_filter = ['is_active']
     search_fields = ['name', 'description']
     list_editable = ['is_active']
     actions = ['activate_types', 'deactivate_types']
+    
+    def description_preview(self, obj):
+        """Display truncated description"""
+        if obj.description:
+            return obj.description[:50] + ('...' if len(obj.description) > 50 else '')
+        return '-'
+    description_preview.short_description = 'Description'
     
     def activate_types(self, request, queryset):
         """Activate selected organization types"""

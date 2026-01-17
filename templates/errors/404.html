@@ -1,0 +1,382 @@
+# Create 404 error page
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found - PesaFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 20px;
+    }
+    .error-content {
+        max-width: 600px;
+    }
+    .error-icon {
+        font-size: 120px;
+        color: var(--primary-color);
+        margin-bottom: 30px;
+    }
+    .error-title {
+        font-size: 48px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+    }
+    .error-message {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    .btn {
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+    }
+    .btn-outline {
+        background: white;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">🔍</div>
+        <h1 class="error-title">404 - Page Not Found</h1>
+        <p class="error-message">
+            Oops! The page you're looking for seems to have wandered off.<br>
+            It might have been moved, deleted, or never existed.
+        </p>
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home me-2"></i>Go Home
+            </a>
+            <a href="javascript:history.back()" class="btn btn-outline">
+                <i class="fas fa-arrow-left me-2"></i>Go Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+EOF
+
+# Create 500 error page
+cat > templates/errors/500.html << 'EOF'
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Server Error - PesaFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 20px;
+    }
+    .error-content {
+        max-width: 600px;
+    }
+    .error-icon {
+        font-size: 120px;
+        color: #ff4757;
+        margin-bottom: 30px;
+    }
+    .error-title {
+        font-size: 48px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+    }
+    .error-message {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    .btn {
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+    }
+    .btn-outline {
+        background: white;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    .support-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 40px;
+        border: 1px solid #e1e5e9;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">🚨</div>
+        <h1 class="error-title">500 - Server Error</h1>
+        <p class="error-message">
+            Something went wrong on our end.<br>
+            Our technical team has been notified and is working to fix the issue.
+        </p>
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home me-2"></i>Go Home
+            </a>
+            <a href="javascript:location.reload()" class="btn btn-outline">
+                <i class="fas fa-redo me-2"></i>Try Again
+            </a>
+        </div>
+        
+        <div class="support-info">
+            <p style="margin: 0 0 10px; font-weight: 600;">Need immediate assistance?</p>
+            <p style="margin: 0; color: #666;">
+                Contact our support team: 
+                <a href="mailto:support@pesaflow.co.ke" style="color: var(--primary-color);">support@pesaflow.co.ke</a>
+                <br>
+                Or call: <strong>+254 700 000 000</strong>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+EOF
+
+# Create 403 error page
+cat > templates/errors/403.html << 'EOF'
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Access Denied - PesaFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 20px;
+    }
+    .error-content {
+        max-width: 600px;
+    }
+    .error-icon {
+        font-size: 120px;
+        color: #ffa502;
+        margin-bottom: 30px;
+    }
+    .error-title {
+        font-size: 48px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+    }
+    .error-message {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    .btn {
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+    }
+    .btn-outline {
+        background: white;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">🚫</div>
+        <h1 class="error-title">403 - Access Denied</h1>
+        <p class="error-message">
+            You don't have permission to access this page.<br>
+            Please check your credentials or contact your administrator.
+        </p>
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home me-2"></i>Go Home
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-outline">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+EOF
+
+# Create 400 error page
+cat > templates/errors/400.html << 'EOF'
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Bad Request - PesaFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 20px;
+    }
+    .error-content {
+        max-width: 600px;
+    }
+    .error-icon {
+        font-size: 120px;
+        color: #3742fa;
+        margin-bottom: 30px;
+    }
+    .error-title {
+        font-size: 48px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+    }
+    .error-message {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    .btn {
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+    }
+    .btn-outline {
+        background: white;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">⚠️</div>
+        <h1 class="error-title">400 - Bad Request</h1>
+        <p class="error-message">
+            Your browser sent a request that this server could not understand.<br>
+            Please check your request and try again.
+        </p>
+        
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home me-2"></i>Go Home
+            </a>
+            <a href="javascript:history.back()" class="btn btn-outline">
+                <i class="fas fa-arrow-left me-2"></i>Go Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

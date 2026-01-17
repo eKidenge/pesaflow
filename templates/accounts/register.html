@@ -1,0 +1,397 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Register - PesaFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 20px;
+    }
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 500px;
+        overflow: hidden;
+    }
+    .auth-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+    .auth-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+    }
+    .auth-header p {
+        margin: 10px 0 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+    .auth-body {
+        padding: 40px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s;
+    }
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        outline: none;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+        padding: 14px 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        width: 100%;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(67, 97, 238, 0.3);
+    }
+    .role-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+    .role-option {
+        flex: 1;
+        text-align: center;
+        padding: 12px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .role-option.active {
+        border-color: var(--primary-color);
+        background: rgba(67, 97, 238, 0.05);
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    .role-icon {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+    .row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .col {
+        flex: 1;
+    }
+    .role-specific-fields {
+        display: none;
+        margin-top: 20px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border: 2px solid #e1e5e9;
+    }
+    .role-specific-fields.active {
+        display: block;
+    }
+    .login-link {
+        text-align: center;
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px solid #e1e5e9;
+        font-size: 14px;
+    }
+    .login-link a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}{% endblock %}
+{% block page_actions %}{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Create Account</h1>
+            <p>Join PesaFlow and streamline your payments</p>
+        </div>
+        
+        <div class="auth-body">
+            {% include 'base/messages.html' %}
+            
+            <form method="post" action="{% url 'register' %}">
+                {% csrf_token %}
+                
+                <!-- Hidden role field -->
+                <input type="hidden" name="role" id="selectedRole" value="{{ role|default:'business' }}">
+                
+                <!-- Role Selector -->
+                <div class="role-selector">
+                    <div class="role-option" data-role="admin" onclick="selectRole('admin')">
+                        <div class="role-icon">👑</div>
+                        <div>Admin</div>
+                    </div>
+                    <div class="role-option active" data-role="business" onclick="selectRole('business')">
+                        <div class="role-icon">🏢</div>
+                        <div>Business</div>
+                    </div>
+                    <div class="role-option" data-role="client" onclick="selectRole('client')">
+                        <div class="role-icon">👤</div>
+                        <div>Client</div>
+                    </div>
+                </div>
+                
+                <!-- Common Fields -->
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="form-label" for="first_name">First Name</label>
+                            <input type="text" 
+                                   id="first_name" 
+                                   name="first_name" 
+                                   class="form-control" 
+                                   placeholder="Enter first name"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="form-label" for="last_name">Last Name</label>
+                            <input type="text" 
+                                   id="last_name" 
+                                   name="last_name" 
+                                   class="form-control" 
+                                   placeholder="Enter last name"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           class="form-control" 
+                           placeholder="Enter your email"
+                           required>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="form-label" for="phone">Phone Number</label>
+                            <input type="tel" 
+                                   id="phone" 
+                                   name="phone" 
+                                   class="form-control" 
+                                   placeholder="+254..."
+                                   required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="form-label" for="country">Country</label>
+                            <select id="country" name="country" class="form-control" required>
+                                <option value="">Select country</option>
+                                <option value="Kenya" selected>Kenya</option>
+                                <option value="Uganda">Uganda</option>
+                                <option value="Tanzania">Tanzania</option>
+                                <option value="Rwanda">Rwanda</option>
+                                <option value="Ethiopia">Ethiopia</option>
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="Ghana">Ghana</option>
+                                <option value="South Africa">South Africa</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" 
+                                   id="password" 
+                                   name="password" 
+                                   class="form-control" 
+                                   placeholder="Create password"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="form-label" for="confirm_password">Confirm Password</label>
+                            <input type="password" 
+                                   id="confirm_password" 
+                                   name="confirm_password" 
+                                   class="form-control" 
+                                   placeholder="Confirm password"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Business-specific fields -->
+                <div id="businessFields" class="role-specific-fields active">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; color: #333;">Business Information</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="business_name">Business/Organization Name</label>
+                        <input type="text" 
+                               id="business_name" 
+                               name="business_name" 
+                               class="form-control" 
+                               placeholder="Enter business name">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="form-label" for="business_type">Business Type</label>
+                                <select id="business_type" name="business_type" class="form-control">
+                                    <option value="">Select type</option>
+                                    <option value="school">School</option>
+                                    <option value="hospital">Hospital/Clinic</option>
+                                    <option value="real_estate">Real Estate</option>
+                                    <option value="retail">Retail Business</option>
+                                    <option value="service">Service Provider</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="form-label" for="business_address">Business Address</label>
+                                <input type="text" 
+                                       id="business_address" 
+                                       name="business_address" 
+                                       class="form-control" 
+                                       placeholder="Business address">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Admin-specific fields -->
+                <div id="adminFields" class="role-specific-fields">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; color: #333;">Admin Information</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="admin_code">Admin Registration Code</label>
+                        <input type="text" 
+                               id="admin_code" 
+                               name="admin_code" 
+                               class="form-control" 
+                               placeholder="Enter admin registration code">
+                        <small style="color: #666; font-size: 12px;">Contact support for admin registration code</small>
+                    </div>
+                </div>
+                
+                <!-- Client-specific fields -->
+                <div id="clientFields" class="role-specific-fields">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; color: #333;">Client Information</h4>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="form-label" for="id_number">ID/Passport Number</label>
+                                <input type="text" 
+                                       id="id_number" 
+                                       name="id_number" 
+                                       class="form-control" 
+                                       placeholder="ID or passport number">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="form-label" for="address">Address</label>
+                                <input type="text" 
+                                       id="address" 
+                                       name="address" 
+                                       class="form-control" 
+                                       placeholder="Your address">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn-primary">Create Account</button>
+            </form>
+            
+            <!-- Login Link -->
+            <div class="login-link">
+                Already have an account? <a href="{% url 'login' %}">Sign In</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function selectRole(role) {
+        // Update hidden input
+        document.getElementById('selectedRole').value = role;
+        
+        // Update visual selection
+        document.querySelectorAll('.role-option').forEach(option => {
+            if (option.dataset.role === role) {
+                option.classList.add('active');
+            } else {
+                option.classList.remove('active');
+            }
+        });
+        
+        // Show/hide role-specific fields
+        document.querySelectorAll('.role-specific-fields').forEach(field => {
+            field.classList.remove('active');
+        });
+        
+        if (role === 'business') {
+            document.getElementById('businessFields').classList.add('active');
+        } else if (role === 'admin') {
+            document.getElementById('adminFields').classList.add('active');
+        } else if (role === 'client') {
+            document.getElementById('clientFields').classList.add('active');
+        }
+    }
+    
+    // Initialize role selection
+    document.addEventListener('DOMContentLoaded', function() {
+        selectRole('business'); // Default to business
+    });
+</script>
+{% endblock %}

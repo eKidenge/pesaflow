@@ -409,7 +409,7 @@ def admin_dashboard(request):
         messages.error(request, 'Please login to access the dashboard.')
         return redirect('login')
     
-    if not request.user.is_system_admin():
+    if request.user.user_type != 'system_admin':
         messages.error(request, 'Access denied. Admin privileges required.')
         return redirect(get_user_redirect_url(request.user))
     
@@ -426,7 +426,7 @@ def admin_dashboard(request):
         'recent_organizations': Organization.objects.order_by('-created_at')[:10],
     }
     
-    return render(request, 'dashboard/admin_dashboard.html', context)
+    return render(request, 'admin_dashboard.html', context)
 
 
 def business_dashboard(request):
@@ -452,7 +452,7 @@ def business_dashboard(request):
         'user_type_display': user.get_user_type_display(),
     }
     
-    return render(request, 'dashboard/business_dashboard.html', context)
+    return render(request, 'business_dashboard.html', context)
 
 
 def customer_dashboard(request):
@@ -474,7 +474,7 @@ def customer_dashboard(request):
         'phone_verified': user.phone_verified,
     }
     
-    return render(request, 'dashboard/customer_dashboard.html', context)
+    return render(request, 'customer_dashboard.html', context)
 
 
 # ==============================================
@@ -901,6 +901,23 @@ def check_auth_status(request):
             'role': request.user.user_type
         })
     return Response({'authenticated': False})
+
+
+
+# ==============================================
+# DASHBOARD REDIRECT VIEW    JAN 17 2026
+# ==============================================
+
+def dashboard_redirect(request):
+    """
+    Generic dashboard view that redirects to appropriate dashboard based on user type
+    """
+    if not request.user.is_authenticated:
+        messages.info(request, 'Please login to access your dashboard.')
+        return redirect('login')
+    
+    # Use your existing get_user_redirect_url function
+    return redirect(get_user_redirect_url(request.user))
 
 
 # ==============================================

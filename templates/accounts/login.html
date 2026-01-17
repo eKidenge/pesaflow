@@ -1,0 +1,255 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Login - PesaFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 20px;
+    }
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 420px;
+        overflow: hidden;
+    }
+    .auth-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+    .auth-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+    }
+    .auth-header p {
+        margin: 10px 0 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+    .auth-body {
+        padding: 40px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s;
+    }
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        outline: none;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+        padding: 14px 20px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        width: 100%;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(67, 97, 238, 0.3);
+    }
+    .role-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+    .role-option {
+        flex: 1;
+        text-align: center;
+        padding: 12px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .role-option.active {
+        border-color: var(--primary-color);
+        background: rgba(67, 97, 238, 0.05);
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    .role-icon {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+    .remember-forgot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        font-size: 14px;
+    }
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .forgot-password {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+    .forgot-password:hover {
+        text-decoration: underline;
+    }
+    .register-link {
+        text-align: center;
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px solid #e1e5e9;
+        font-size: 14px;
+    }
+    .register-link a {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}{% endblock %}
+{% block page_actions %}{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Welcome Back</h1>
+            <p>Sign in to your PesaFlow account</p>
+        </div>
+        
+        <div class="auth-body">
+            {% include 'base/messages.html' %}
+            
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                
+                <!-- Hidden role field that will be updated by JavaScript -->
+                <input type="hidden" name="role" id="selectedRole" value="{{ role|default:'business' }}">
+                
+                <!-- Role Selector -->
+                <div class="role-selector">
+                    <div class="role-option {% if role == 'admin' or not role %}active{% endif %}" 
+                         data-role="admin"
+                         onclick="selectRole('admin')">
+                        <div class="role-icon">👑</div>
+                        <div>Admin</div>
+                    </div>
+                    <div class="role-option {% if role == 'business' %}active{% endif %}" 
+                         data-role="business"
+                         onclick="selectRole('business')">
+                        <div class="role-icon">🏢</div>
+                        <div>Business</div>
+                    </div>
+                    <div class="role-option {% if role == 'client' %}active{% endif %}" 
+                         data-role="client"
+                         onclick="selectRole('client')">
+                        <div class="role-icon">👤</div>
+                        <div>Client</div>
+                    </div>
+                </div>
+                
+                <!-- Email/Username Field -->
+                <div class="form-group">
+                    <label class="form-label" for="username">Email or Username</label>
+                    <input type="text" 
+                           id="username" 
+                           name="username" 
+                           class="form-control" 
+                           placeholder="Enter your email or username"
+                           value="{{ username|default:'' }}"
+                           required>
+                </div>
+                
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           class="form-control" 
+                           placeholder="Enter your password"
+                           required>
+                </div>
+                
+                <!-- Remember Me & Forgot Password -->
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" 
+                               id="remember_me" 
+                               name="remember_me"
+                               {% if remember_me %}checked{% endif %}>
+                        <label for="remember_me">Remember me</label>
+                    </div>
+                    <a href="{% url 'password_reset' %}" class="forgot-password">Forgot password?</a>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn-primary">Sign In</button>
+            </form>
+            
+            <!-- Register Link -->
+            <div class="register-link">
+                Don't have an account? <a href="{% url 'register' %}">Create Account</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function selectRole(role) {
+        // Update hidden input
+        document.getElementById('selectedRole').value = role;
+        
+        // Update visual selection
+        document.querySelectorAll('.role-option').forEach(option => {
+            if (option.dataset.role === role) {
+                option.classList.add('active');
+            } else {
+                option.classList.remove('active');
+            }
+        });
+    }
+    
+    // Initialize role selection
+    document.addEventListener('DOMContentLoaded', function() {
+        const initialRole = '{{ role|default:"business" }}';
+        selectRole(initialRole);
+    });
+</script>
+{% endblock %}

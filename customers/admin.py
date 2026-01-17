@@ -5,10 +5,18 @@ from django.urls import reverse
 from django.db.models import Sum, Count
 from .models import Customer, CustomerGroup
 
+# Import the Payment model for the inline
+try:
+    from payments.models import Payment
+    HAS_PAYMENT_MODEL = True
+except ImportError:
+    HAS_PAYMENT_MODEL = False
+    Payment = None
+
 
 class PaymentInline(admin.TabularInline):
     """Inline admin for Payment"""
-    model = 'payments.Payment'
+    model = Payment if HAS_PAYMENT_MODEL else None
     extra = 0
     readonly_fields = ['payment_reference', 'amount', 'status', 'created_at']
     fields = ['payment_reference', 'amount', 'status', 'created_at']
@@ -17,11 +25,17 @@ class PaymentInline(admin.TabularInline):
     
     def has_add_permission(self, request, obj):
         return False
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        """Only show inline if Payment model exists"""
+        if self.model is None:
+            return None
+        return super().get_formset(request, obj, **kwargs)
 
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    """Admin configuration for Customer model"""
+    """Admin configuration for Customer model - FIXED"""
     
     list_display = [
         'customer_code', 'full_name', 'phone_number', 'organization',
@@ -107,9 +121,10 @@ class CustomerAdmin(admin.ModelAdmin):
     )
     
     raw_id_fields = ['organization', 'created_by']
-    filter_horizontal = ['groups']
     
-    inlines = [PaymentInline]
+    # REMOVED: filter_horizontal = ['groups'] - because 'groups' is a reverse relation, not a direct ManyToManyField
+    
+    inlines = [PaymentInline] if HAS_PAYMENT_MODEL else []
     
     actions = [
         'activate_customers', 'deactivate_customers',
@@ -129,30 +144,35 @@ class CustomerAdmin(admin.ModelAdmin):
     
     def payment_count(self, obj):
         """Display payment count"""
-        return obj.payments.count()
+        if hasattr(obj, 'payments'):
+            return obj.payments.count()
+        return 0
     payment_count.short_description = 'Payments'
     
     def total_paid(self, obj):
         """Display total amount paid"""
-        from django.db.models import Sum
-        total = obj.payments.filter(status='completed').aggregate(
-            total=Sum('amount')
-        )['total']
-        return f"KES {total or 0:,.2f}"
+        if hasattr(obj, 'payments'):
+            total = obj.payments.filter(status='completed').aggregate(
+                total=Sum('amount')
+            )['total']
+            return f"KES {total or 0:,.2f}"
+        return "KES 0.00"
     total_paid.short_description = 'Total Paid'
     
     def groups_list(self, obj):
         """Display groups as links"""
-        groups = obj.groups.all()
-        if not groups:
-            return "No groups"
-        
-        links = []
-        for group in groups:
-            url = reverse('admin:customers_customergroup_change', args=[group.id])
-            links.append(f'<a href="{url}">{group.name}</a>')
-        
-        return format_html(', '.join(links))
+        if hasattr(obj, 'groups'):
+            groups = obj.groups.all()
+            if not groups:
+                return "No groups"
+            
+            links = []
+            for group in groups:
+                url = reverse('admin:customers_customergroup_change', args=[group.id])
+                links.append(f'<a href="{url}">{group.name}</a>')
+            
+            return format_html(', '.join(links))
+        return "No groups field"
     groups_list.short_description = 'Groups'
     
     def activate_customers(self, request, queryset):
@@ -295,7 +315,9 @@ class CustomerAdmin(admin.ModelAdmin):
         """Custom queryset for admin"""
         qs = super().get_queryset(request)
         qs = qs.select_related('organization', 'created_by')
-        qs = qs.prefetch_related('groups', 'payments')
+        qs = qs.prefetch_related('groups')
+        if HAS_PAYMENT_MODEL:
+            qs = qs.prefetch_related('payments')
         return qs
 
 
@@ -310,7 +332,7 @@ class CustomerInline(admin.TabularInline):
 
 @admin.register(CustomerGroup)
 class CustomerGroupAdmin(admin.ModelAdmin):
-    """Admin configuration for CustomerGroup model"""
+    """Admin configuration for CustomerGroup model - FIXED"""
     
     list_display = [
         'name', 'organization', 'group_type', 'is_active',
@@ -351,6 +373,7 @@ class CustomerGroupAdmin(admin.ModelAdmin):
         }),
     )
     
+    # KEPT: filter_horizontal = ['customers'] - because 'customers' IS a direct ManyToManyField on CustomerGroup
     filter_horizontal = ['customers']
     
     inlines = [CustomerInline]

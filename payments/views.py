@@ -756,3 +756,91 @@ class PaymentPlanViewSet(viewsets.ModelViewSet):
             'payment': PaymentSerializer(payment).data,
             'payment_plan': PaymentPlanSerializer(payment_plan).data
         })
+
+    # ==============================================
+# TEMPLATE VIEWS
+# ==============================================
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Q
+
+@login_required
+def payments_list_view(request):
+    """
+    Template view for payments list page
+    """
+    user = request.user
+    
+    # Redirect if no organization (for non-admin users)
+    if not user.organization and not user.is_system_admin():
+        from django.shortcuts import redirect
+        if user.is_system_admin():
+            return redirect('admin_dashboard')
+        elif user.user_type in ['business_owner', 'business_staff']:
+            return redirect('business_dashboard')
+        else:
+            return redirect('customer_dashboard')
+    
+    # Get payments based on user role
+    if user.is_system_admin():
+        payments = Payment.objects.all()
+    elif user.organization:
+        payments = Payment.objects.filter(organization=user.organization)
+    else:
+        payments = Payment.objects.none()
+    
+    # Apply filters
+    status_filter = request.GET.get('status', '')
+    payment_method = request.GET.get('method', '')
+    search_query = request.GET.get('q', '')
+    
+    if status_filter:
+        payments = payments.filter(status=status_filter)
+    
+    if payment_method:
+        payments = payments.filter(payment_method=payment_method)
+    
+    if search_query:
+        payments = payments.filter(
+            Q(payment_reference__icontains=search_query) |
+            Q(external_reference__icontains=search_query) |
+            Q(payer_name__icontains=search_query) |
+            Q(payer_phone__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+    
+    # Date range filter
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    if date_from:
+        payments = payments.filter(created_at__date__gte=date_from)
+    if date_to:
+        payments = payments.filter(created_at__date__lte=date_to)
+    
+    # Pagination
+    paginator = Paginator(payments.order_by('-created_at'), 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Statistics
+    total_amount = payments.filter(status='completed').aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+    
+    context = {
+        'page_obj': page_obj,
+        'total_amount': total_amount,
+        'total_payments': payments.count(),
+        'completed_payments': payments.filter(status='completed').count(),
+        'failed_payments': payments.filter(status='failed').count(),
+        'status_filter': status_filter,
+        'method_filter': payment_method,
+        'search_query': search_query,
+        'date_from': date_from,
+        'date_to': date_to,
+    }
+    
+    return render(request, 'payments/list.html', context)

@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.views.generic import TemplateView  # You already have this import
 
 # Schema view for API documentation
 schema_view = get_schema_view(
@@ -21,6 +22,9 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    # ADD THIS LINE - handles http://127.0.0.1:8000/
+    path('', TemplateView.as_view(template_name='index.html'), name='home'),
+    
     # Django admin
     path('admin/', admin.site.urls),
     
@@ -38,6 +42,9 @@ urlpatterns = [
     
     # Health check
     path('health/', include('health_check.urls')),
+    path('settings/', TemplateView.as_view(template_name='settings.html'), name='settings'),
+    # ADD THIS LINE:
+    path('reports/', TemplateView.as_view(template_name='reports/index.html'), name='reports'),
 ]
 
 # Serve media files in development

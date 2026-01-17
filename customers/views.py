@@ -517,3 +517,72 @@ class CustomerGroupViewSet(viewsets.ModelViewSet):
         return Response({
             'message': f'Notification scheduled for {group.customers.count()} customers'
         })
+
+# ==============================================
+# TEMPLATE VIEWS
+# ==============================================
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+
+@login_required
+def customers_list_view(request):
+    """
+    Template view for customers list page
+    """
+    user = request.user
+    
+    if not user.organization:
+        # Redirect to appropriate dashboard
+        from django.shortcuts import redirect
+        if user.is_system_admin():
+            return redirect('admin_dashboard')
+        elif user.user_type in ['business_owner', 'business_staff']:
+            return redirect('business_dashboard')
+        else:
+            return redirect('customer_dashboard')
+    
+    # Get customers for the organization
+    customers = Customer.objects.filter(organization=user.organization)
+    
+    # Apply filters
+    status_filter = request.GET.get('status', '')
+    customer_type = request.GET.get('type', '')
+    search_query = request.GET.get('q', '')
+    
+    if status_filter:
+        customers = customers.filter(status=status_filter)
+    
+    if customer_type:
+        customers = customers.filter(customer_type=customer_type)
+    
+    if search_query:
+        customers = customers.filter(
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(phone_number__icontains=search_query) |
+            Q(customer_code__icontains=search_query)
+        )
+    
+    # Pagination
+    paginator = Paginator(customers.order_by('-created_at'), 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get statistics
+    total_customers = customers.count()
+    active_customers = customers.filter(status='active').count()
+    
+    context = {
+        'page_obj': page_obj,
+        'total_customers': total_customers,
+        'active_customers': active_customers,
+        'inactive_customers': total_customers - active_customers,
+        'status_filter': status_filter,
+        'type_filter': customer_type,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'customers/list.html', context)

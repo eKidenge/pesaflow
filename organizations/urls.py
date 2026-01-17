@@ -8,5 +8,9 @@ router.register(r'organizations', views.OrganizationViewSet, basename='organizat
 router.register(r'members', views.OrganizationMemberViewSet, basename='organization-member')
 
 urlpatterns = [
+    path('organizations/create/', views.OrganizationViewSet.as_view({'get': 'create'}), name='organizations_create'),
+    # ADD THIS LINE (inside urlpatterns):
+    path('organizations/list/', views.OrganizationViewSet.as_view({'get': 'list'}), name='organizations_list'),
+    
     path('', include(router.urls)),
 ]

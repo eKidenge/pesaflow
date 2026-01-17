@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.views.generic import TemplateView  # ADD THIS LINE
 from . import views
 
 router = DefaultRouter()
@@ -11,6 +12,9 @@ urlpatterns = [
     # ==============================================
     # HTML TEMPLATE ROUTES (For your login/register pages)
     # ==============================================
+    
+    # ADD THIS LINE - Generic dashboard redirect
+    path('dashboard/', views.dashboard_redirect, name='dashboard'),
     
     # Authentication pages
     path('login/', views.login_view, name='login'),
@@ -51,6 +55,8 @@ urlpatterns = [
     
     # Profile management
     path('api/update-profile/', views.update_profile_api, name='update_profile_api'),
+    # ADD THIS LINE:
+    path('profile/', TemplateView.as_view(template_name='accounts/profile.html'), name='profile'),
     
     # Token refresh
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

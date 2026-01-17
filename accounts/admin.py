@@ -1,3 +1,4 @@
+# accounts/admin.py - FULL FIXED VERSION
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
@@ -27,7 +28,7 @@ class UserProfileInline(admin.StackedInline):
             'fields': ['gender', 'date_of_birth', 'national_id']
         }),
         ('Contact Information', {
-            'fields': ['address', 'city', 'country', 'website']
+            'fields': ['address', 'website']
         }),
         ('Professional Information', {
             'fields': ['designation', 'department', 'bio']
@@ -76,7 +77,7 @@ class LoginHistoryInline(admin.TabularInline):
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    """Admin configuration for User model - UPDATED FOR NEW MODELS"""
+    """Admin configuration for User model"""
     
     list_display = [
         'email', 'full_name', 'phone', 'user_type_display', 
@@ -407,22 +408,21 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    """Admin configuration for UserProfile model"""
+    """Admin configuration for UserProfile model - FIXED"""
     
     list_display = [
         'user_email', 'user_full_name', 'national_id', 
-        'gender', 'city', 'country', 'designation',
+        'gender', 'get_user_city', 'get_user_country', 'designation',
         'account_status', 'created_at_short'
     ]
     
     list_filter = [
-        'gender', 'country', 'city', 
-        'account_locked', 'created_at', 'updated_at'
+        'gender', 'account_locked', 'created_at', 'updated_at'
     ]
     
     search_fields = [
         'user__email', 'user__first_name', 'user__last_name',
-        'national_id', 'city', 'country', 'designation'
+        'national_id', 'user__city', 'user__country', 'designation'
     ]
     
     readonly_fields = [
@@ -440,7 +440,7 @@ class UserProfileAdmin(admin.ModelAdmin):
             )
         }),
         (_('Contact Information'), {
-            'fields': ('address', 'city', 'country')
+            'fields': ('address',) # Removed 'website' from here
         }),
         (_('Professional Information'), {
             'fields': ('designation', 'department', 'bio')
@@ -489,6 +489,16 @@ class UserProfileAdmin(admin.ModelAdmin):
         return obj.user.full_name
     user_full_name.short_description = 'Full Name'
     user_full_name.admin_order_field = 'user__first_name'
+    
+    def get_user_city(self, obj):
+        return obj.user.city if hasattr(obj.user, 'city') else ''
+    get_user_city.short_description = 'City'
+    get_user_city.admin_order_field = 'user__city'
+    
+    def get_user_country(self, obj):
+        return obj.user.country if hasattr(obj.user, 'country') else ''
+    get_user_country.short_description = 'Country'
+    get_user_country.admin_order_field = 'user__country'
     
     def account_status(self, obj):
         if obj.account_locked:
