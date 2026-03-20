@@ -18,10 +18,15 @@ urlpatterns = [
     path('integrations/<uuid:pk>/regenerate-webhook/', views.IntegrationViewSet.as_view({'post': 'regenerate_webhook_secret'}), name='regenerate_webhook'),
     path('integrations/<uuid:pk>/update-mpesa/', views.IntegrationViewSet.as_view({'put': 'update_mpesa_credentials'}), name='update_mpesa_credentials'),
     path('integrations/<uuid:pk>/statistics/', views.IntegrationViewSet.as_view({'get': 'statistics'}), name='integration_statistics'),
+    
+    # ADD THESE NEW URL PATTERNS FOR TEMPLATE VIEWS:
+    path('mpesa/config/', views.mpesa_config_template, name='integrations_mpesa_config'),
+    path('mpesa/config/save/', views.mpesa_config_save, name='integrations_mpesa_config_save'),
+    
     # In integrations/urls.py, add this line:
-path('integrations/logs/', views.APILogViewSet.as_view({'get': 'list'}), name='integrations_logs'),
-    # ADD THIS LINE:
+    path('integrations/logs/', views.APILogViewSet.as_view({'get': 'list'}), name='integrations_logs'),
     path('integrations/list/', views.IntegrationViewSet.as_view({'get': 'list'}), name='integrations_list'),
+    
     # API log endpoints
     path('logs/statistics/', views.APILogViewSet.as_view({'get': 'statistics'}), name='api_log_statistics'),
     path('logs/retry-failed/', views.APILogViewSet.as_view({'post': 'retry_failed'}), name='retry_failed_logs'),

@@ -606,19 +606,6 @@
             animation: slideDown 0.5s ease-out;
         }
         
-        .page-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--gray-900);
-            margin-bottom: 0.5rem;
-            line-height: 1.2;
-        }
-        
-        .page-subtitle {
-            color: var(--gray-600);
-            font-size: 1rem;
-        }
-        
         .page-actions {
             display: flex;
             gap: 0.75rem;
@@ -1270,11 +1257,16 @@
                 border: 1px solid var(--gray-300);
             }
         }
+        
+        /* Fix for non-admin users - remove sidebar margin */
+        .non-admin-user .main-content {
+            margin-left: 0 !important;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% if user.is_authenticated and user.user_type == 'system_admin' %}admin-user{% else %}non-admin-user{% endif %}">
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loader"></div>
@@ -1286,10 +1278,12 @@
     
     <!-- App Container -->
     <div class="app-container">
+        <!-- ONLY SHOW SIDEBAR FOR SYSTEM ADMIN USERS -->
+        {% if user.is_authenticated and user.user_type == 'system_admin' %}
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <a href="{% url 'dashboard' %}" class="sidebar-logo">
+                <a href="{% url 'admin_dashboard' %}" class="sidebar-logo">
                     <div class="sidebar-logo-icon">
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
@@ -1299,60 +1293,53 @@
             
             <div class="sidebar-menu">
                 <div class="menu-section">Main</div>
-                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}">
+                <a href="{% url 'admin_dashboard' %}" class="menu-item">
                     <i class="menu-icon fas fa-tachometer-alt"></i>
                     <span class="menu-text">Dashboard</span>
                 </a>
                 
                 <div class="menu-section">Business</div>
-                <a href="{% url 'customers_list' %}" class="menu-item {% if 'customers' in request.path %}active{% endif %}">
+                <a href="{% url 'customers_list' %}" class="menu-item">
                     <i class="menu-icon fas fa-users"></i>
                     <span class="menu-text">Customers</span>
-                    {% if customer_notifications %}
-                    <span class="menu-badge new">{{ customer_notifications }}</span>
-                    {% endif %}
                 </a>
                 
-                <a href="{% url 'payments_list' %}" class="menu-item {% if 'payments' in request.path %}active{% endif %}">
+                <a href="{% url 'payments_list' %}" class="menu-item">
                     <i class="menu-icon fas fa-credit-card"></i>
                     <span class="menu-text">Payments</span>
                 </a>
                 
-                <a href="{% url 'invoices_list' %}" class="menu-item {% if 'invoices' in request.path %}active{% endif %}">
+                <a href="{% url 'invoices_list' %}" class="menu-item">
                     <i class="menu-icon fas fa-file-invoice"></i>
                     <span class="menu-text">Invoices</span>
-                    {% if pending_invoices %}
-                    <span class="menu-badge">{{ pending_invoices }}</span>
-                    {% endif %}
                 </a>
                 
                 <div class="menu-section">Communication</div>
-                <a href="{% url 'notifications_templates_list' %}" class="menu-item {% if 'notifications' in request.path %}active{% endif %}">
+                <a href="{% url 'notifications_templates_list' %}" class="menu-item">
                     <i class="menu-icon fas fa-bell"></i>
                     <span class="menu-text">Notifications</span>
                 </a>
                 
                 <div class="menu-section">Integration</div>
-                <a href="{% url 'integrations_list' %}" class="menu-item {% if 'integrations' in request.path %}active{% endif %}">
-                    <i class="menu-icon fas fa-plug"></i>
-                    <span class="menu-text">Integrations</span>
-                    <span class="menu-badge new">NEW</span>
+                <a href="{% url 'integrations_mpesa_config' %}" class="menu-item">
+                    <i class="menu-icon fas fa-phone-alt"></i>
+                    <span class="menu-text">M-Pesa Config</span>
                 </a>
                 
                 <div class="menu-divider"></div>
                 
                 <div class="menu-section">Admin</div>
-                <a href="{% url 'organizations_list' %}" class="menu-item {% if 'organizations' in request.path %}active{% endif %}">
+                <a href="{% url 'organizations_list' %}" class="menu-item">
                     <i class="menu-icon fas fa-building"></i>
                     <span class="menu-text">Organizations</span>
                 </a>
                 
-                <a href="{% url 'settings' %}" class="menu-item {% if 'settings' in request.path %}active{% endif %}">
+                <a href="{% url 'system_settings' %}" class="menu-item">
                     <i class="menu-icon fas fa-cog"></i>
                     <span class="menu-text">Settings</span>
                 </a>
                 
-                <a href="{% url 'reports' %}" class="menu-item {% if 'reports' in request.path %}active{% endif %}">
+                <a href="{% url 'reports' %}" class="menu-item">
                     <i class="menu-icon fas fa-chart-bar"></i>
                     <span class="menu-text">Reports</span>
                 </a>
@@ -1365,26 +1352,28 @@
                     </div>
                     <div class="user-info">
                         <div class="user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
-                        <div class="user-role">{{ request.user.get_role_display|default:"User" }}</div>
+                        <div class="user-role">System Admin</div>
                     </div>
                     <i class="user-dropdown fas fa-chevron-right"></i>
                 </a>
             </div>
         </aside>
+        {% endif %}
         
         <!-- Main Content -->
         <main class="main-content" id="main-content">
-            <!-- Navbar -->
             <nav class="navbar">
                 <div class="navbar-content">
                     <div class="navbar-left">
+                        {% if user.is_authenticated and user.user_type == 'system_admin' %}
                         <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
                             <i class="fas fa-bars"></i>
                         </button>
+                        {% endif %}
                         
                         <nav class="breadcrumb" aria-label="breadcrumb">
                             {% block breadcrumb %}
-                            <a href="{% url 'dashboard' %}" class="breadcrumb-item">
+                            <a href="{% if user.is_authenticated %}{% if user.user_type == 'system_admin' %}{% url 'admin_dashboard' %}{% elif user.user_type == 'business_owner' %}{% url 'business_dashboard' %}{% else %}{% url 'customer_dashboard' %}{% endif %}{% else %}{% url 'login' %}{% endif %}" class="breadcrumb-item">
                                 <i class="fas fa-home"></i>
                             </a>
                             <span class="breadcrumb-divider">/</span>
@@ -1431,9 +1420,6 @@
             <div class="content-area">
                 <!-- Page Header -->
                 <header class="page-header">
-
-                    <p class="page-subtitle">{% block page_subtitle %}Welcome back, {{ request.user.get_full_name|default:request.user.username }}. Here's what's happening today.{% endblock %}</p>
-                    
                     <div class="page-actions">
                         {% block page_actions %}
                         <button class="btn btn-primary">
@@ -1605,8 +1591,10 @@
             console.log('PesaFlow Platform v2.4.1 initialized');
             
             // Set current year in footer
-            document.querySelector('.footer-left').innerHTML = 
-                document.querySelector('.footer-left').innerHTML.replace('{% now "Y" %}', new Date().getFullYear());
+            const footerLeft = document.querySelector('.footer-left');
+            if (footerLeft) {
+                footerLeft.innerHTML = footerLeft.innerHTML.replace('{% now "Y" %}', new Date().getFullYear());
+            }
             
             // Performance monitoring
             if ('performance' in window) {
@@ -1620,13 +1608,15 @@
             
             function updateOnlineStatus() {
                 const statusIndicator = document.querySelector('.status-indicator');
-                if (navigator.onLine) {
-                    statusIndicator.className = 'status-indicator status-online';
-                    statusIndicator.querySelector('span:last-child').textContent = 'System Status: Online';
-                } else {
-                    statusIndicator.className = 'status-indicator status-offline';
-                    statusIndicator.querySelector('span:last-child').textContent = 'System Status: Offline';
-                    showOfflineAlert();
+                if (statusIndicator) {
+                    if (navigator.onLine) {
+                        statusIndicator.className = 'status-indicator status-online';
+                        statusIndicator.querySelector('span:last-child').textContent = 'System Status: Online';
+                    } else {
+                        statusIndicator.className = 'status-indicator status-offline';
+                        statusIndicator.querySelector('span:last-child').textContent = 'System Status: Offline';
+                        showOfflineAlert();
+                    }
                 }
             }
             
@@ -1664,7 +1654,8 @@
                 // Ctrl/Cmd + K for search
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                     e.preventDefault();
-                    document.getElementById('searchButton').click();
+                    const searchButton = document.getElementById('searchButton');
+                    if (searchButton) searchButton.click();
                 }
                 
                 // Ctrl/Cmd + / for help
@@ -1698,6 +1689,9 @@
             const sidebarToggle = document.getElementById('sidebarToggle');
             const mainContent = document.querySelector('.main-content');
             
+            // Only proceed if sidebar exists (admin users)
+            if (!sidebar || !sidebarToggle) return;
+            
             // Toggle sidebar on button click
             sidebarToggle.addEventListener('click', function() {
                 if (window.innerWidth < 768) {
@@ -1707,7 +1701,9 @@
                     // Desktop: toggle width
                     const isCollapsed = sidebar.style.width === '70px' || getComputedStyle(sidebar).width === '70px';
                     sidebar.style.width = isCollapsed ? 'var(--sidebar-width)' : '70px';
-                    mainContent.style.marginLeft = isCollapsed ? 'var(--sidebar-width)' : '70px';
+                    if (mainContent) {
+                        mainContent.style.marginLeft = isCollapsed ? 'var(--sidebar-width)' : '70px';
+                    }
                     
                     // Update menu items
                     const hiddenElements = sidebar.querySelectorAll('.menu-text, .menu-badge, .user-info, .user-dropdown, .menu-section');
@@ -1750,6 +1746,8 @@
             const notificationsButton = document.getElementById('notificationsButton');
             const notificationsDropdown = document.getElementById('notificationsDropdown');
             
+            if (!notificationsButton || !notificationsDropdown) return;
+            
             notificationsButton.addEventListener('click', function(e) {
                 e.stopPropagation();
                 notificationsDropdown.classList.toggle('show');
@@ -1762,7 +1760,6 @@
                 
                 // Mark as read on open
                 if (notificationsDropdown.classList.contains('show')) {
-                    // In real app, would make API call to mark as read
                     console.log('Notifications opened');
                 }
             });
@@ -1777,30 +1774,36 @@
         
         function initSearch() {
             const searchButton = document.getElementById('searchButton');
-            const searchModal = new bootstrap.Modal(document.getElementById('searchModal'));
+            const searchModal = document.getElementById('searchModal');
+            
+            if (!searchButton || !searchModal) return;
+            
+            const modal = new bootstrap.Modal(searchModal);
             
             searchButton.addEventListener('click', function() {
-                searchModal.show();
+                modal.show();
             });
             
-            // Focus search input when modal opens
-            document.getElementById('searchModal').addEventListener('shown.bs.modal', function() {
+            searchModal.addEventListener('shown.bs.modal', function() {
                 this.querySelector('input[type="search"]').focus();
             });
             
-            // Handle search input
-            const searchInput = document.querySelector('#searchModal input[type="search"]');
-            searchInput.addEventListener('input', debounce(function(e) {
-                const query = e.target.value.trim();
-                if (query.length > 2) {
-                    performSearch(query);
-                }
-            }, 300));
+            const searchInput = searchModal.querySelector('input[type="search"]');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(function(e) {
+                    const query = e.target.value.trim();
+                    if (query.length > 2) {
+                        performSearch(query);
+                    }
+                }, 300));
+            }
         }
         
         function initQuickActions() {
             const quickActionsButton = document.getElementById('quickActionsButton');
             const quickActionsDropdown = document.getElementById('quickActionsDropdown');
+            
+            if (!quickActionsButton || !quickActionsDropdown) return;
             
             quickActionsButton.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -1815,15 +1818,12 @@
         }
         
         function initThemeSwitcher() {
-            // Check for saved theme preference or respect OS preference
             const savedTheme = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             
             if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
                 document.documentElement.setAttribute('data-bs-theme', 'dark');
             }
-            
-            // Theme switcher would be added here in a real implementation
         }
         
         // Utility functions
@@ -1840,10 +1840,8 @@
         }
         
         function performSearch(query) {
-            // In real app, this would make API call
             console.log('Searching for:', query);
             
-            // Simulate search results
             const results = [
                 { type: 'customer', name: 'John Doe', email: 'john@example.com', id: 1 },
                 { type: 'invoice', number: 'INV-001', amount: 'KES 5,000', status: 'paid', id: 2 },
@@ -1851,32 +1849,33 @@
             ];
             
             const resultsContainer = document.querySelector('.search-results');
-            if (results.length > 0) {
-                resultsContainer.innerHTML = results.map(result => `
-                    <a href="#" class="search-result-item">
-                        <div class="search-result-icon">
-                            <i class="fas fa-${result.type === 'customer' ? 'user' : result.type === 'invoice' ? 'file-invoice' : 'money-bill-wave'}"></i>
+            if (resultsContainer) {
+                if (results.length > 0) {
+                    resultsContainer.innerHTML = results.map(result => `
+                        <a href="#" class="search-result-item">
+                            <div class="search-result-icon">
+                                <i class="fas fa-${result.type === 'customer' ? 'user' : result.type === 'invoice' ? 'file-invoice' : 'money-bill-wave'}"></i>
+                            </div>
+                            <div class="search-result-content">
+                                <div class="search-result-title">${result.name || result.number || result.reference}</div>
+                                <div class="search-result-details">${result.email || `Amount: ${result.amount}`}</div>
+                            </div>
+                        </a>
+                    `).join('');
+                } else {
+                    resultsContainer.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No results found for "${query}"</p>
                         </div>
-                        <div class="search-result-content">
-                            <div class="search-result-title">${result.name || result.number || result.reference}</div>
-                            <div class="search-result-details">${result.email || `Amount: ${result.amount}`}</div>
-                        </div>
-                    </a>
-                `).join('');
-            } else {
-                resultsContainer.innerHTML = `
-                    <div class="text-center py-4">
-                        <i class="fas fa-search fa-2x text-muted mb-3"></i>
-                        <p class="text-muted">No results found for "${query}"</p>
-                    </div>
-                `;
+                    `;
+                }
             }
         }
         
         // Error boundary for unhandled errors
         window.addEventListener('error', function(e) {
             console.error('Unhandled error:', e.error);
-            // In production, this would send to error tracking service
         });
         
         // Unhandled promise rejection handler
@@ -1889,10 +1888,8 @@
     
     <!-- Performance Monitoring -->
     <script>
-        // Report Web Vitals (Core Web Vitals)
         if (typeof window.gtag !== 'undefined') {
             window.addEventListener('load', function() {
-                // Report LCP (Largest Contentful Paint)
                 new PerformanceObserver((entryList) => {
                     const entries = entryList.getEntries();
                     const lastEntry = entries[entries.length - 1];
@@ -1903,7 +1900,6 @@
                     });
                 }).observe({type: 'largest-contentful-paint', buffered: true});
                 
-                // Report FID (First Input Delay)
                 new PerformanceObserver((entryList) => {
                     const entries = entryList.getEntries();
                     entries.forEach(entry => {
@@ -1916,7 +1912,6 @@
                     });
                 }).observe({type: 'first-input', buffered: true});
                 
-                // Report CLS (Cumulative Layout Shift)
                 let clsValue = 0;
                 new PerformanceObserver((entryList) => {
                     for (const entry of entryList.getEntries()) {

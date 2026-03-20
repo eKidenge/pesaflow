@@ -701,15 +701,16 @@
                                         <input type="hidden" name="role" id="selectedRole" value="admin">
                                         <input type="hidden" name="next" id="nextUrl" value="{% url 'admin_dashboard' %}">
                                         
+                                        <!-- UPDATED: Changed from username to email field -->
                                         <div class="form-group-enhanced">
-                                            <label for="username">
-                                                <i class="fas fa-user-shield"></i>
-                                                Admin Username
+                                            <label for="email">
+                                                <i class="fas fa-envelope"></i>
+                                                Admin Email
                                             </label>
                                             <div class="input-with-icon">
-                                                <i class="fas fa-at"></i>
-                                                <input type="text" class="form-control" id="username" name="username" 
-                                                       placeholder="Enter admin username" required autofocus>
+                                                <i class="fas fa-envelope"></i>
+                                                <input type="email" class="form-control" id="email" name="email" 
+                                                       placeholder="Enter admin email" required autofocus>
                                             </div>
                                         </div>
                                         
@@ -815,21 +816,21 @@
                 
                 <div class="mb-3">
                     <h6><i class="fas fa-crown text-warning me-2"></i>Admin Account</h6>
-                    <p class="mb-1">Username: <code>admin@pesaflow.co.ke</code></p>
+                    <p class="mb-1">Email: <code>admin@pesaflow.co.ke</code></p>
                     <p class="mb-1">Password: <code>Admin@2024</code></p>
                     <small class="text-muted">→ Redirects to: <strong>Admin Dashboard</strong></small>
                 </div>
                 
                 <div class="mb-3">
                     <h6><i class="fas fa-building text-primary me-2"></i>Business Account</h6>
-                    <p class="mb-1">Username: <code>business@example.com</code></p>
+                    <p class="mb-1">Email: <code>business@example.com</code></p>
                     <p class="mb-1">Password: <code>Business@2024</code></p>
                     <small class="text-muted">→ Redirects to: <strong>Business Dashboard</strong></small>
                 </div>
                 
                 <div class="mb-0">
                     <h6><i class="fas fa-user-tie text-success me-2"></i>Client Account</h6>
-                    <p class="mb-1">Username: <code>client@example.com</code></p>
+                    <p class="mb-1">Email: <code>client@example.com</code></p>
                     <p class="mb-0">Password: <code>Client@2024</code></p>
                     <small class="text-muted">→ Redirects to: <strong>Customer Dashboard</strong></small>
                 </div>
@@ -858,7 +859,9 @@
         const selectedRoleInput = document.getElementById('selectedRole');
         const nextUrlInput = document.getElementById('nextUrl');
         const loginButton = document.getElementById('loginButton');
-        const usernameInput = document.getElementById('username');
+        
+        // UPDATED: Changed from username to email
+        const emailInput = document.getElementById('email');
         
         // Dashboard URLs - Make sure these match your Django URL names
         const dashboardUrls = {
@@ -867,15 +870,15 @@
             'client': "{% url 'customer_dashboard' %}"
         };
         
-        // Role-specific configurations
+        // UPDATED: Role-specific configurations with email placeholders
         const roleConfigs = {
             admin: {
                 title: 'Admin Dashboard Login',
                 subtitle: 'Access system administration and platform management',
                 buttonText: 'Sign In to Admin Dashboard',
                 icon: 'fas fa-crown',
-                placeholder: 'Enter admin username',
-                labelIcon: 'fas fa-user-shield',
+                placeholder: 'Enter admin email',
+                labelIcon: 'fas fa-envelope',
                 dashboardName: 'Admin Dashboard'
             },
             business: {
@@ -883,8 +886,8 @@
                 subtitle: 'Manage your organization, payments, and analytics',
                 buttonText: 'Sign In to Business Dashboard',
                 icon: 'fas fa-building',
-                placeholder: 'Enter business email or username',
-                labelIcon: 'fas fa-user-tie',
+                placeholder: 'Enter business email',
+                labelIcon: 'fas fa-envelope',
                 dashboardName: 'Business Dashboard'
             },
             client: {
@@ -893,7 +896,7 @@
                 buttonText: 'Sign In to Customer Dashboard',
                 icon: 'fas fa-user-circle',
                 placeholder: 'Enter your email address',
-                labelIcon: 'fas fa-user',
+                labelIcon: 'fas fa-envelope',
                 dashboardName: 'Customer Dashboard'
             }
         };
@@ -930,13 +933,23 @@
                 buttonIcon.className = config.icon;
                 loginButton.innerHTML = `<i class="${config.icon}"></i> ${config.buttonText}`;
                 
-                // Update input placeholder and label
-                usernameInput.placeholder = config.placeholder;
+                // UPDATED: Update input placeholder
+                emailInput.placeholder = config.placeholder;
                 
-                // Update label icon
-                const labelIcon = document.querySelector('.form-group-enhanced label i');
+                // UPDATED: Update label icon and text
+                const label = document.querySelector('.form-group-enhanced label');
+                const labelIcon = label.querySelector('i');
                 if (labelIcon) {
                     labelIcon.className = config.labelIcon;
+                }
+                // Update label text based on role
+                const labelText = label.querySelector('span') || label;
+                if (selectedRole === 'admin') {
+                    label.innerHTML = `<i class="${config.labelIcon}"></i> Admin Email`;
+                } else if (selectedRole === 'business') {
+                    label.innerHTML = `<i class="${config.labelIcon}"></i> Business Email`;
+                } else {
+                    label.innerHTML = `<i class="${config.labelIcon}"></i> Client Email`;
                 }
             });
         });
@@ -958,20 +971,27 @@
             }
         });
         
-        // Form submission with role-based redirect
+        // UPDATED: Form submission with email-based authentication
         const loginForm = document.getElementById('loginForm');
         
         loginForm.addEventListener('submit', function(e) {
             // Prevent default form submission for demo
             e.preventDefault();
             
-            // Get form data
-            const username = usernameInput.value.trim();
+            // UPDATED: Get email instead of username
+            const email = emailInput.value.trim();
             const password = passwordInput.value;
             
             // Basic validation
-            if (!username || !password) {
+            if (!email || !password) {
                 showError('Please fill in all required fields');
+                return;
+            }
+            
+            // Email format validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('Please enter a valid email address');
                 return;
             }
             
@@ -1008,8 +1028,8 @@
                 // Redirect after 1.5 seconds
                 setTimeout(() => {
                     // In real app, remove the alert and use actual redirect
-                    // For now, we'll show an alert
-                    alert(`SUCCESS! Would redirect to: ${redirectUrl}\n\nAdmin → admin_dashboard.html\nBusiness → business_dashboard.html\nClient → customer_dashboard.html`);
+                    // For now, we'll show an alert with the email used
+                    alert(`SUCCESS! Logged in with email: ${email}\nWould redirect to: ${redirectUrl}\n\nAdmin → admin_dashboard.html\nBusiness → business_dashboard.html\nClient → customer_dashboard.html`);
                     
                     // Uncomment for actual redirect:
                     // window.location.href = redirectUrl;
@@ -1032,25 +1052,25 @@
             }
         };
         
-        // Auto-fill demo credentials
+        // UPDATED: Auto-fill demo credentials with email
         window.autoFillCredentials = function() {
             const demoCredentials = {
                 admin: {
-                    username: 'admin@pesaflow.co.ke',
+                    email: 'admin@pesaflow.co.ke',
                     password: 'Admin@2024'
                 },
                 business: {
-                    username: 'business@example.com',
+                    email: 'business@example.com',
                     password: 'Business@2024'
                 },
                 client: {
-                    username: 'client@example.com',
+                    email: 'client@example.com',
                     password: 'Client@2024'
                 }
             };
             
             const creds = demoCredentials[selectedRole];
-            usernameInput.value = creds.username;
+            emailInput.value = creds.email;
             passwordInput.value = creds.password;
             
             // Show success message
@@ -1118,8 +1138,8 @@
         const loginFormEl = document.querySelector('.login-form');
         loginFormEl.style.animation = 'fadeIn 0.8s ease-out';
         
-        // Auto-focus username field
-        usernameInput.focus();
+        // UPDATED: Auto-focus email field
+        emailInput.focus();
     });
 </script>
 {% endblock %}

@@ -59,11 +59,11 @@ def get_client_ip(request):
 
 def get_user_redirect_url(user):
     """Determine redirect URL based on user type"""
-    if user.is_system_admin():
+    if user.is_system_admin:
         return reverse('admin_dashboard')
     elif user.user_type in ['business_owner', 'business_staff']:
         return reverse('business_dashboard')
-    elif user.is_client():
+    elif user.is_client:
         return reverse('customer_dashboard')
     else:
         return reverse('login')
@@ -115,14 +115,14 @@ def login_view(request):
         return redirect(get_user_redirect_url(request.user))
     
     if request.method == 'POST':
-        # Extract form data
-        username = request.POST.get('username')
+        # Extract form data - using email instead of username
+        email = request.POST.get('email')  # CHANGED: from 'username' to 'email'
         password = request.POST.get('password')
         role = request.POST.get('role', 'business')
         remember_me = request.POST.get('remember_me') == 'on'
         
-        # Authenticate user
-        user = authenticate(request, username=username, password=password)
+        # FIXED: Authenticate using email, not username
+        user = authenticate(request, email=email, password=password)
         
         if user is not None:
             if user.is_active:
@@ -147,7 +147,7 @@ def login_view(request):
                 
                 # Redirect based on role - MATCHING YOUR TEMPLATE LOGIC
                 if role == 'admin':
-                    if user.is_system_admin():
+                    if user.is_system_admin:
                         messages.success(request, 'Welcome to Admin Dashboard!')
                         return redirect('admin_dashboard')
                     else:
@@ -165,7 +165,7 @@ def login_view(request):
                         return redirect('login')
                 
                 elif role == 'client':
-                    if user.is_client():
+                    if user.is_client:
                         messages.success(request, 'Welcome to Customer Portal!')
                         return redirect('customer_dashboard')
                     else:
@@ -176,11 +176,12 @@ def login_view(request):
             else:
                 messages.error(request, 'Your account is disabled. Please contact support.')
         else:
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, 'Invalid email or password.')
             
             # Track failed login attempts
             try:
-                user = User.objects.get(Q(username=username) | Q(email=username))
+                # FIXED: Search by email instead of username
+                user = User.objects.get(email=email)
                 if hasattr(user, 'profile'):
                     user.profile.login_attempts += 1
                     user.profile.last_login_attempt = timezone.now()
@@ -198,7 +199,7 @@ def login_view(request):
         
         # If authentication failed, stay on login page
         return render(request, 'accounts/login.html', {
-            'username': username,
+            'email': email,  # CHANGED: from 'username' to 'email'
             'role': role,
             'remember_me': remember_me
         })
@@ -247,10 +248,9 @@ def register_view(request):
                     messages.error(request, 'Passwords do not match.')
                     return redirect('register')
                 
-                # Create user
+                # FIXED: Create user WITHOUT username parameter
                 user = User.objects.create_user(
-                    username=email,
-                    email=email,
+                    email=email,  # REMOVED: username=email
                     password=password,
                     first_name=first_name,
                     last_name=last_name,
@@ -461,7 +461,7 @@ def customer_dashboard(request):
         messages.error(request, 'Please login to access the dashboard.')
         return redirect('login')
     
-    if not request.user.is_client():
+    if not request.user.is_client:
         messages.error(request, 'Access denied. Please login as a customer.')
         return redirect(get_user_redirect_url(request.user))
     
@@ -614,11 +614,12 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
-            username = serializer.validated_data['username']
+            email = serializer.validated_data['email']  # CHANGED: from 'username' to 'email'
             password = serializer.validated_data['password']
             role = serializer.validated_data.get('role', 'business')
             
-            user = authenticate(username=username, password=password)
+            # FIXED: Authenticate using email, not username
+            user = authenticate(email=email, password=password)
             
             if user and user.is_active:
                 # Generate JWT tokens

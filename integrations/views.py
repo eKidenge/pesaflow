@@ -606,3 +606,161 @@ def mpesa_callback(request):
         )
         
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# MPESA INTEGRATION ADDED ON 21/3/2026 AT 12:16 AM
+# Add this import at the top with other imports if not already present
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+
+
+@login_required
+def mpesa_config_template(request):
+    """
+    Template view for M-Pesa configuration page
+    """
+    # Check if user is business owner or staff
+    if not request.user.user_type in ['business_owner', 'business_staff']:
+        messages.error(request, 'Access denied. Business account required.')
+        return redirect('business_dashboard')
+    
+    # Get the user's organization
+    organization = request.user.organization
+    
+    if not organization:
+        messages.error(request, 'No organization found. Please contact support.')
+        return redirect('business_dashboard')
+    
+    # Get existing M-Pesa integrations for this organization
+    mpesa_integrations = Integration.objects.filter(
+        organization=organization,
+        integration_type__provider='safaricom',
+        is_active=True
+    )
+    
+    # Get the first active M-Pesa integration or create a default one
+    mpesa_integration = mpesa_integrations.first()
+    
+    # Get M-Pesa credentials from integration config
+    mpesa_config = {}
+    if mpesa_integration:
+        mpesa_config = mpesa_integration.config.get('mpesa', {})
+    
+    context = {
+        'user': request.user,
+        'organization': organization,
+        'mpesa_integration': mpesa_integration,
+        'shortcode': mpesa_config.get('shortcode', ''),
+        'consumer_key': mpesa_config.get('consumer_key', ''),
+        'consumer_secret': mpesa_config.get('consumer_secret', ''),
+        'passkey': mpesa_config.get('passkey', ''),
+        'environment': mpesa_config.get('environment', 'sandbox'),
+        'callback_url': mpesa_config.get('callback_url', ''),
+        'has_integration': bool(mpesa_integration),
+        'is_configured': bool(mpesa_config.get('shortcode') and mpesa_config.get('consumer_key'))
+    }
+    
+    return render(request, 'integrations/mpesa_config.html', context)
+
+
+@login_required
+@csrf_protect
+def mpesa_config_save(request):
+    """
+    Save M-Pesa configuration
+    """
+    if request.method != 'POST':
+        return redirect('integrations_mpesa_config')
+    
+    # Check if user is business owner or staff
+    if not request.user.user_type in ['business_owner', 'business_staff']:
+        messages.error(request, 'Access denied. Business account required.')
+        return redirect('business_dashboard')
+    
+    organization = request.user.organization
+    
+    if not organization:
+        messages.error(request, 'No organization found.')
+        return redirect('business_dashboard')
+    
+    try:
+        # Get form data
+        shortcode = request.POST.get('shortcode', '').strip()
+        consumer_key = request.POST.get('consumer_key', '').strip()
+        consumer_secret = request.POST.get('consumer_secret', '').strip()
+        passkey = request.POST.get('passkey', '').strip()
+        environment = request.POST.get('environment', 'sandbox')
+        callback_url = request.POST.get('callback_url', '').strip()
+        
+        # Validate required fields
+        if not shortcode or not consumer_key or not consumer_secret:
+            messages.error(request, 'Shortcode, Consumer Key, and Consumer Secret are required.')
+            return redirect('integrations_mpesa_config')
+        
+        # Get or create M-Pesa integration type
+        integration_type, _ = IntegrationType.objects.get_or_create(
+            provider='safaricom',
+            defaults={
+                'name': 'M-Pesa',
+                'category': 'payment',
+                'description': 'Safaricom M-Pesa payment integration',
+                'is_active': True
+            }
+        )
+        
+        # Get or create integration
+        integration, created = Integration.objects.get_or_create(
+            organization=organization,
+            integration_type=integration_type,
+            defaults={
+                'name': f'M-Pesa - {shortcode}',
+                'description': 'M-Pesa payment processing integration',
+                'environment': environment,
+                'config': {
+                    'mpesa': {
+                        'shortcode': shortcode,
+                        'consumer_key': consumer_key,
+                        'consumer_secret': consumer_secret,
+                        'passkey': passkey,
+                        'environment': environment,
+                        'callback_url': callback_url
+                    }
+                },
+                'status': 'active' if environment == 'production' else 'testing',
+                'created_by': request.user
+            }
+        )
+        
+        if not created:
+            # Update existing integration
+            integration.config['mpesa'] = {
+                'shortcode': shortcode,
+                'consumer_key': consumer_key,
+                'consumer_secret': consumer_secret,
+                'passkey': passkey,
+                'environment': environment,
+                'callback_url': callback_url
+            }
+            integration.environment = environment
+            integration.save()
+        
+        messages.success(request, 'M-Pesa configuration saved successfully!')
+        
+        # Test the configuration if requested
+        if request.POST.get('test_connection') == 'on':
+            from .mpesa import get_access_token
+            
+            try:
+                token = get_access_token(integration)
+                if token:
+                    messages.success(request, 'Connection test successful! M-Pesa API is accessible.')
+                else:
+                    messages.warning(request, 'Configuration saved but connection test failed. Please verify your credentials.')
+            except Exception as e:
+                messages.warning(request, f'Configuration saved but test failed: {str(e)}')
+        
+    except Exception as e:
+        messages.error(request, f'Error saving configuration: {str(e)}')
+    
+    return redirect('integrations_mpesa_config')

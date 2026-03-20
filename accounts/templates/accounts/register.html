@@ -5,12 +5,6 @@
 
 {% block extra_css %}
 <style>
-    :root {
-        --business-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
-        --client-gradient: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
-        --admin-gradient: linear-gradient(135deg, #7209b7 0%, #b5179e 100%);
-    }
-    
     .register-hero {
         background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         min-height: 100vh;
@@ -39,7 +33,7 @@
     }
     
     .register-sidebar {
-        background: var(--business-gradient);
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
         color: white;
         padding: 60px 40px;
         display: flex;
@@ -96,48 +90,56 @@
         margin-bottom: 15px;
     }
     
-    /* Registration Form Styles */
+    .features-list {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .features-list h5 {
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    
+    .features-list .d-flex {
+        margin-bottom: 20px;
+    }
+    
+    .features-list i {
+        font-size: 1.2rem;
+        margin-top: 3px;
+    }
+    
+    /* Form Styles */
     .registration-form {
         animation: fadeIn 0.5s ease;
     }
     
     .form-section-title {
-        margin-bottom: 25px;
+        margin-bottom: 30px;
         padding-bottom: 15px;
         border-bottom: 2px solid #f8f9fa;
     }
     
     .form-section-title h3 {
         font-weight: 700;
-        color: var(--dark-color);
+        color: #2d3748;
+        margin-bottom: 5px;
     }
     
-    /* Role-specific form sections */
-    .role-section {
-        display: none;
-        animation: fadeIn 0.5s ease;
-    }
-    
-    .role-section.active {
-        display: block;
-    }
-    
-    /* Form styling */
     .form-group-enhanced {
         margin-bottom: 25px;
-        position: relative;
     }
     
     .form-group-enhanced label {
         font-weight: 600;
-        color: var(--dark-color);
+        color: #2d3748;
         margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 8px;
     }
     
-    .form-group-enhanced .required {
+    .required {
         color: #f72585;
     }
     
@@ -150,7 +152,7 @@
         left: 15px;
         top: 50%;
         transform: translateY(-50%);
-        color: #6c757d;
+        color: #a0aec0;
         z-index: 2;
     }
     
@@ -158,71 +160,54 @@
     .input-with-icon select,
     .input-with-icon textarea {
         padding-left: 45px;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s ease;
+        width: 100%;
     }
     
-    /* Role Selection Cards */
+    .input-with-icon input:focus,
+    .input-with-icon select:focus,
+    .input-with-icon textarea:focus {
+        border-color: #4361ee;
+        box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        outline: none;
+    }
+    
+    /* Role Cards */
     .role-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 20px;
         margin: 30px 0;
     }
     
     .role-card {
-        border: 2px solid #e9ecef;
+        border: 2px solid #e2e8f0;
         border-radius: 15px;
-        padding: 30px;
+        padding: 25px 20px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
         position: relative;
-        overflow: hidden;
     }
     
     .role-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: #4361ee;
     }
     
     .role-card.selected {
-        border-color: var(--primary-color);
+        border-color: #4361ee;
         background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(58, 12, 163, 0.05));
-    }
-    
-    .role-icon {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        font-size: 2rem;
-        color: white;
-    }
-    
-    .role-card[data-role="admin"] .role-icon {
-        background: var(--admin-gradient);
-    }
-    
-    .role-card[data-role="business"] .role-icon {
-        background: var(--business-gradient);
-    }
-    
-    .role-card[data-role="client"] .role-icon {
-        background: var(--client-gradient);
-    }
-    
-    .role-card h4 {
-        margin-bottom: 10px;
-        font-weight: 700;
     }
     
     .selected-badge {
         position: absolute;
         top: 15px;
         right: 15px;
-        background: var(--primary-color);
+        background: #4361ee;
         color: white;
         width: 24px;
         height: 24px;
@@ -241,55 +226,63 @@
         transform: scale(1);
     }
     
-    /* Form footer */
-    .form-footer {
+    .role-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid #e9ecef;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 1.8rem;
+        color: white;
     }
     
-    .terms-checkbox {
-        margin-top: 20px;
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 10px;
+    .role-card[data-role="admin"] .role-icon {
+        background: linear-gradient(135deg, #7209b7 0%, #b5179e 100%);
     }
     
-    .terms-checkbox label {
-        font-size: 0.9rem;
+    .role-card[data-role="business"] .role-icon {
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+    }
+    
+    .role-card[data-role="client"] .role-icon {
+        background: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
+    }
+    
+    .role-card h4 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .role-card p {
+        font-size: 0.85rem;
         color: #6c757d;
+        margin-bottom: 0;
     }
     
-    .terms-checkbox a {
-        color: var(--primary-color);
-        text-decoration: none;
-        font-weight: 600;
-    }
-    
-    .login-link {
-        text-align: center;
-        margin-top: 30px;
+    /* Role-specific sections */
+    .role-section {
+        display: none;
+        animation: fadeIn 0.5s ease;
+        margin-top: 20px;
         padding-top: 20px;
-        border-top: 1px solid #e9ecef;
+        border-top: 1px solid #e2e8f0;
     }
     
-    .login-link a {
-        color: var(--primary-color);
-        font-weight: 600;
-        text-decoration: none;
+    .role-section.active {
+        display: block;
     }
     
     /* Password strength */
     .password-strength {
-        margin-top: 10px;
+        margin-top: 8px;
     }
     
     .strength-meter {
         height: 4px;
-        background: #e9ecef;
+        background: #e2e8f0;
         border-radius: 2px;
         overflow: hidden;
         margin-bottom: 5px;
@@ -304,8 +297,86 @@
     }
     
     .strength-text {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         color: #6c757d;
+    }
+    
+    /* Phone input */
+    .phone-input-group {
+        display: flex;
+        align-items: stretch;
+    }
+    
+    .phone-code {
+        background: #f8f9fa;
+        border: 2px solid #e2e8f0;
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        color: #2d3748;
+        font-weight: 600;
+    }
+    
+    .phone-input-group input {
+        border-radius: 0 10px 10px 0;
+        flex: 1;
+    }
+    
+    /* Form footer */
+    .form-footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .login-link {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .login-link a {
+        color: #4361ee;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        border: none;
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(67, 97, 238, 0.2);
+    }
+    
+    /* Alert messages */
+    .alert-role {
+        display: none;
+        animation: shake 0.5s ease;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     /* Responsive */
@@ -316,10 +387,6 @@
         
         .register-content {
             padding: 40px 20px;
-        }
-        
-        .brand-display h1 {
-            font-size: 2rem;
         }
         
         .role-cards {
@@ -395,7 +462,7 @@
                                         <label class="form-label">Select Account Type <span class="required">*</span></label>
                                         <div class="role-cards">
                                             <!-- Admin Account -->
-                                            <div class="role-card selected" data-role="admin">
+                                            <div class="role-card selected" data-role="system_admin">
                                                 <div class="selected-badge">
                                                     <i class="fas fa-check"></i>
                                                 </div>
@@ -404,24 +471,10 @@
                                                 </div>
                                                 <h4>System Administrator</h4>
                                                 <p>For platform administrators who manage organizations and system settings.</p>
-                                                <div class="mt-3">
-                                                    <small class="text-primary d-block">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        Access all organizations
-                                                    </small>
-                                                    <small class="text-primary d-block">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        System configuration
-                                                    </small>
-                                                    <small class="text-primary d-block">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        User management
-                                                    </small>
-                                                </div>
                                             </div>
                                             
                                             <!-- Business Account -->
-                                            <div class="role-card" data-role="business">
+                                            <div class="role-card" data-role="business_owner">
                                                 <div class="selected-badge">
                                                     <i class="fas fa-check"></i>
                                                 </div>
@@ -430,20 +483,6 @@
                                                 </div>
                                                 <h4>Business Account</h4>
                                                 <p>For companies and organizations that process payments and manage customers.</p>
-                                                <div class="mt-3">
-                                                    <small class="text-primary d-block">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        Payment processing
-                                                    </small>
-                                                    <small class="text-primary d-block">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        Customer management
-                                                    </small>
-                                                    <small class="text-primary d-block">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        Analytics & reporting
-                                                    </small>
-                                                </div>
                                             </div>
                                             
                                             <!-- Client Account -->
@@ -452,146 +491,154 @@
                                                     <i class="fas fa-check"></i>
                                                 </div>
                                                 <div class="role-icon">
-                                                    <i class="fas fa-user-tie"></i>
+                                                    <i class="fas fa-user"></i>
                                                 </div>
                                                 <h4>Client Account</h4>
                                                 <p>For individuals who make payments and manage their transaction history.</p>
-                                                <div class="mt-3">
-                                                    <small class="text-primary d-block">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        Make payments
-                                                    </small>
-                                                    <small class="text-primary d-block">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        View invoices
-                                                    </small>
-                                                    <small class="text-primary d-block">
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                        Transaction history
-                                                    </small>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <!-- Registration Form -->
-                                    <form method="post" id="registrationForm">
+                                    <!-- Registration Form - NO USERNAME FIELD! -->
+                                    <form method="post" id="registrationForm" action="{% url 'register' %}">
                                         {% csrf_token %}
-                                        <input type="hidden" name="role" id="selectedRole" value="admin">
+                                        <input type="hidden" name="role" id="selectedRole" value="system_admin">
                                         
-                                        <!-- Common Fields -->
+                                        <!-- Personal Information -->
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group-enhanced">
-                                                    <label>First Name <span class="required">*</span></label>
+                                                    <label for="first_name">First Name <span class="required">*</span></label>
                                                     <div class="input-with-icon">
                                                         <i class="fas fa-user"></i>
-                                                        <input type="text" class="form-control" name="first_name" required>
+                                                        <input type="text" class="form-control" id="first_name" name="first_name" 
+                                                               placeholder="Enter your first name" required>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group-enhanced">
-                                                    <label>Last Name <span class="required">*</span></label>
+                                                    <label for="last_name">Last Name <span class="required">*</span></label>
                                                     <div class="input-with-icon">
                                                         <i class="fas fa-user"></i>
-                                                        <input type="text" class="form-control" name="last_name" required>
+                                                        <input type="text" class="form-control" id="last_name" name="last_name" 
+                                                               placeholder="Enter your last name" required>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         
+                                        <!-- Email Field (Required) -->
                                         <div class="form-group-enhanced">
-                                            <label>Email Address <span class="required">*</span></label>
+                                            <label for="email">Email Address <span class="required">*</span></label>
                                             <div class="input-with-icon">
                                                 <i class="fas fa-envelope"></i>
-                                                <input type="email" class="form-control" name="email" required>
+                                                <input type="email" class="form-control" id="email" name="email" 
+                                                       placeholder="you@example.com" required>
+                                            </div>
+                                            <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+                                        </div>
+                                        
+                                        <!-- Phone Field -->
+                                        <div class="form-group-enhanced">
+                                            <label for="phone">Phone Number <span class="required">*</span></label>
+                                            <div class="phone-input-group">
+                                                <span class="phone-code">+254</span>
+                                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                                       placeholder="712345678" required
+                                                       pattern="[0-9]{9}" 
+                                                       title="Please enter a valid 9-digit phone number (e.g., 712345678)">
+                                            </div>
+                                            <small class="form-text text-muted">Enter 9-digit number without country code</small>
+                                        </div>
+                                        
+                                        <!-- Country Field -->
+                                        <div class="form-group-enhanced">
+                                            <label for="country">Country <span class="required">*</span></label>
+                                            <div class="input-with-icon">
+                                                <i class="fas fa-globe-africa"></i>
+                                                <select class="form-control" id="country" name="country" required>
+                                                    <option value="">Select country</option>
+                                                    <option value="Kenya" selected>Kenya</option>
+                                                    <option value="Tanzania">Tanzania</option>
+                                                    <option value="Uganda">Uganda</option>
+                                                    <option value="Rwanda">Rwanda</option>
+                                                    <option value="Nigeria">Nigeria</option>
+                                                    <option value="Ghana">Ghana</option>
+                                                    <option value="South Africa">South Africa</option>
+                                                </select>
                                             </div>
                                         </div>
                                         
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group-enhanced">
-                                                    <label>Phone Number <span class="required">*</span></label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">+254</span>
-                                                        <input type="tel" class="form-control" name="phone" required>
-                                                    </div>
+                                        <!-- Admin-specific fields (optional) -->
+                                        <div class="role-section" id="adminFields">
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-shield-alt me-2"></i>
+                                                <strong>Note:</strong> Admin accounts require special authorization. Please contact support if you need admin access.
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Business-specific fields -->
+                                        <div class="role-section" id="businessFields">
+                                            <h4 class="mb-3" style="font-size: 1.1rem; font-weight: 600;">Business Information</h4>
+                                            <div class="form-group-enhanced">
+                                                <label for="organization_name">Organization/Business Name</label>
+                                                <div class="input-with-icon">
+                                                    <i class="fas fa-building"></i>
+                                                    <input type="text" class="form-control" id="organization_name" name="organization_name" 
+                                                           placeholder="Enter your business name">
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group-enhanced">
-                                                    <label>Country <span class="required">*</span></label>
-                                                    <select class="form-select" name="country" required>
-                                                        <option value="">Select country</option>
-                                                        <option value="KE">Kenya</option>
-                                                        <option value="TZ">Tanzania</option>
-                                                        <option value="UG">Uganda</option>
-                                                        <option value="RW">Rwanda</option>
-                                                        <option value="NG">Nigeria</option>
-                                                        <option value="GH">Ghana</option>
+                                            <div class="form-group-enhanced">
+                                                <label for="business_type">Business Type</label>
+                                                <div class="input-with-icon">
+                                                    <i class="fas fa-chart-line"></i>
+                                                    <select class="form-control" id="business_type" name="business_type">
+                                                        <option value="">Select business type</option>
+                                                        <option value="sole_proprietor">Sole Proprietor</option>
+                                                        <option value="partnership">Partnership</option>
+                                                        <option value="llc">Limited Liability Company</option>
+                                                        <option value="corporation">Corporation</option>
+                                                        <option value="non_profit">Non-Profit Organization</option>
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>
-                                        
-                                        <!-- Role-specific fields -->
-                                        <div class="role-section active" id="adminFields">
-                                            <div class="alert alert-info">
-                                                <i class="fas fa-shield-alt me-2"></i>
-                                                Admin accounts require special authorization. Please contact support if you need admin access.
-                                            </div>
                                             <div class="form-group-enhanced">
-                                                <label>Admin Key (Optional)</label>
+                                                <label for="position">Your Position/Title</label>
                                                 <div class="input-with-icon">
-                                                    <i class="fas fa-key"></i>
-                                                    <input type="text" class="form-control" name="admin_key" placeholder="Enter admin authorization key">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="role-section" id="businessFields">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group-enhanced">
-                                                        <label>Business Name <span class="required">*</span></label>
-                                                        <div class="input-with-icon">
-                                                            <i class="fas fa-building"></i>
-                                                            <input type="text" class="form-control" name="business_name">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group-enhanced">
-                                                        <label>Business Type <span class="required">*</span></label>
-                                                        <select class="form-select" name="business_type">
-                                                            <option value="">Select type</option>
-                                                            <option value="sole_proprietor">Sole Proprietor</option>
-                                                            <option value="partnership">Partnership</option>
-                                                            <option value="llc">Limited Liability Company</option>
-                                                            <option value="corporation">Corporation</option>
-                                                            <option value="non_profit">Non-Profit Organization</option>
-                                                        </select>
-                                                    </div>
+                                                    <i class="fas fa-briefcase"></i>
+                                                    <input type="text" class="form-control" id="position" name="position" 
+                                                           placeholder="e.g., CEO, Manager, Director">
                                                 </div>
                                             </div>
                                             <div class="form-group-enhanced">
-                                                <label>Business Address</label>
-                                                <textarea class="form-control" name="business_address" rows="2"></textarea>
+                                                <label for="business_address">Business Address</label>
+                                                <div class="input-with-icon">
+                                                    <i class="fas fa-map-marker-alt"></i>
+                                                    <textarea class="form-control" id="business_address" name="business_address" 
+                                                              rows="2" placeholder="Enter your business address"></textarea>
+                                                </div>
                                             </div>
                                         </div>
                                         
+                                        <!-- Client-specific fields -->
                                         <div class="role-section" id="clientFields">
+                                            <h4 class="mb-3" style="font-size: 1.1rem; font-weight: 600;">Personal Information</h4>
                                             <div class="form-group-enhanced">
-                                                <label>ID/Passport Number</label>
+                                                <label for="id_number">National ID / Passport Number</label>
                                                 <div class="input-with-icon">
                                                     <i class="fas fa-id-card"></i>
-                                                    <input type="text" class="form-control" name="id_number">
+                                                    <input type="text" class="form-control" id="id_number" name="id_number" 
+                                                           placeholder="Enter your ID or passport number">
                                                 </div>
                                             </div>
                                             <div class="form-group-enhanced">
-                                                <label>Physical Address</label>
-                                                <textarea class="form-control" name="address" rows="2"></textarea>
+                                                <label for="address">Physical Address</label>
+                                                <div class="input-with-icon">
+                                                    <i class="fas fa-home"></i>
+                                                    <textarea class="form-control" id="address" name="address" rows="2" 
+                                                              placeholder="Enter your physical address"></textarea>
+                                                </div>
                                             </div>
                                         </div>
                                         
@@ -599,10 +646,11 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group-enhanced">
-                                                    <label>Password <span class="required">*</span></label>
+                                                    <label for="password">Password <span class="required">*</span></label>
                                                     <div class="input-with-icon">
                                                         <i class="fas fa-lock"></i>
-                                                        <input type="password" class="form-control" id="password" name="password" required>
+                                                        <input type="password" class="form-control" id="password" name="password" 
+                                                               placeholder="Create password" required minlength="8">
                                                     </div>
                                                     <div class="password-strength">
                                                         <div class="strength-meter">
@@ -614,40 +662,37 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group-enhanced">
-                                                    <label>Confirm Password <span class="required">*</span></label>
+                                                    <label for="confirm_password">Confirm Password <span class="required">*</span></label>
                                                     <div class="input-with-icon">
                                                         <i class="fas fa-lock"></i>
-                                                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+                                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                                                               placeholder="Confirm password" required>
                                                     </div>
-                                                    <div class="form-text" id="passwordMatch"></div>
+                                                    <small class="form-text" id="passwordMatch"></small>
                                                 </div>
                                             </div>
                                         </div>
                                         
                                         <!-- Terms and Conditions -->
-                                        <div class="terms-checkbox">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="terms" required>
-                                                <label class="form-check-label" for="terms">
-                                                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
-                                                </label>
-                                            </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="terms" required>
+                                            <label class="form-check-label" for="terms">
+                                                I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                                            </label>
                                         </div>
                                         
-                                        <div class="terms-checkbox">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="marketing">
-                                                <label class="form-check-label" for="marketing">
-                                                    I want to receive marketing emails about new features and updates
-                                                </label>
-                                            </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="marketing">
+                                            <label class="form-check-label" for="marketing">
+                                                I want to receive marketing emails about new features and updates
+                                            </label>
                                         </div>
                                         
                                         <!-- Submit Button -->
                                         <div class="form-footer">
-                                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                            <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
                                                 <i class="fas fa-user-plus me-2"></i>
-                                                Create <span id="submitRoleText">Admin</span> Account
+                                                Create Account
                                             </button>
                                         </div>
                                     </form>
@@ -666,17 +711,6 @@
     </div>
 </div>
 
-<!-- Redirect Notification -->
-<div class="redirect-notification" id="redirectNotification">
-    <div class="d-flex align-items-center">
-        <i class="fas fa-spinner fa-spin me-3 text-primary"></i>
-        <div>
-            <h6 class="mb-1">Creating <span id="creatingAccountType">Admin</span> Account</h6>
-            <small class="text-muted">Please wait while we set up your account...</small>
-        </div>
-    </div>
-</div>
-
 <!-- Terms Modal -->
 <div class="modal fade" id="termsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -686,7 +720,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Terms and conditions content here...</p>
+                <h6>1. Acceptance of Terms</h6>
+                <p>By registering for PesaFlow, you agree to these terms...</p>
+                <h6>2. Account Responsibilities</h6>
+                <p>You are responsible for maintaining the security of your account...</p>
             </div>
         </div>
     </div>
@@ -701,7 +738,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Privacy policy content here...</p>
+                <h6>Information We Collect</h6>
+                <p>We collect personal information including name, email, phone, and payment details...</p>
             </div>
         </div>
     </div>
@@ -711,122 +749,70 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        let selectedRole = 'admin';
+        let selectedRole = 'system_admin';
         
-        // Role Selection
+        // Role selection
         const roleCards = document.querySelectorAll('.role-card');
         const selectedRoleInput = document.getElementById('selectedRole');
-        const submitRoleText = document.getElementById('submitRoleText');
-        const creatingAccountType = document.getElementById('creatingAccountType');
         const roleSections = document.querySelectorAll('.role-section');
+        const registrationForm = document.getElementById('registrationForm');
+        const submitBtn = document.getElementById('submitBtn');
         
-        // Password elements
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
+        // Form fields
+        const firstName = document.getElementById('first_name');
+        const lastName = document.getElementById('last_name');
+        const email = document.getElementById('email');
+        const phone = document.getElementById('phone');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        const termsCheckbox = document.getElementById('terms');
+        
+        // Password strength
         const strengthFill = document.getElementById('strengthFill');
         const strengthText = document.getElementById('strengthText');
         const passwordMatch = document.getElementById('passwordMatch');
         
-        // Form
-        const registrationForm = document.getElementById('registrationForm');
-        const redirectNotification = document.getElementById('redirectNotification');
-        
-        // Role selection logic
+        // Role selection handler
         roleCards.forEach(card => {
             card.addEventListener('click', function() {
-                // Remove selected class from all cards
+                // Update selected class
                 roleCards.forEach(c => c.classList.remove('selected'));
-                
-                // Add selected class to clicked card
                 this.classList.add('selected');
                 
                 // Update selected role
                 selectedRole = this.dataset.role;
                 selectedRoleInput.value = selectedRole;
                 
-                // Update UI text
-                const roleText = this.querySelector('h4').textContent;
-                submitRoleText.textContent = roleText.replace(' Account', '').replace('System ', '');
-                creatingAccountType.textContent = roleText;
-                
-                // Show appropriate role fields
+                // Show/hide role-specific sections
                 roleSections.forEach(section => {
                     section.classList.remove('active');
                 });
-                document.getElementById(`${selectedRole}Fields`).classList.add('active');
                 
-                // Update required fields based on role
-                updateRequiredFields();
+                if (selectedRole === 'system_admin') {
+                    document.getElementById('adminFields').classList.add('active');
+                } else if (selectedRole === 'business_owner') {
+                    document.getElementById('businessFields').classList.add('active');
+                } else if (selectedRole === 'client') {
+                    document.getElementById('clientFields').classList.add('active');
+                }
             });
         });
         
-        // Update required fields based on role
-        function updateRequiredFields() {
-            // Reset all
-            document.querySelectorAll('input, select').forEach(field => {
-                const label = field.closest('.form-group-enhanced')?.querySelector('label');
-                if (label) {
-                    const requiredSpan = label.querySelector('.required');
-                    if (requiredSpan) {
-                        requiredSpan.remove();
-                    }
-                }
-            });
-            
-            // Common required fields
-            const commonRequired = ['first_name', 'last_name', 'email', 'phone', 'country', 'password', 'confirm_password'];
-            
-            // Role-specific required fields
-            const roleRequired = {
-                admin: [],
-                business: ['business_name', 'business_type'],
-                client: []
-            };
-            
-            // Mark common fields as required
-            commonRequired.forEach(fieldName => {
-                const field = document.querySelector(`[name="${fieldName}"]`);
-                if (field) {
-                    field.required = true;
-                    const label = field.closest('.form-group-enhanced')?.querySelector('label');
-                    if (label && !label.querySelector('.required')) {
-                        label.innerHTML += ' <span class="required">*</span>';
-                    }
-                }
-            });
-            
-            // Mark role-specific fields as required
-            if (roleRequired[selectedRole]) {
-                roleRequired[selectedRole].forEach(fieldName => {
-                    const field = document.querySelector(`[name="${fieldName}"]`);
-                    if (field) {
-                        field.required = true;
-                        const label = field.closest('.form-group-enhanced')?.querySelector('label');
-                        if (label && !label.querySelector('.required')) {
-                            label.innerHTML += ' <span class="required">*</span>';
-                        }
-                    }
-                });
-            }
-        }
-        
         // Password strength checker
-        passwordInput.addEventListener('input', function() {
-            const password = this.value;
+        password.addEventListener('input', function() {
+            const pwd = this.value;
             let strength = 0;
             let text = 'Password strength';
             let color = '#dc3545';
             
-            // Length check
-            if (password.length >= 8) strength += 25;
-            // Uppercase check
-            if (/[A-Z]/.test(password)) strength += 25;
-            // Number check
-            if (/[0-9]/.test(password)) strength += 25;
-            // Special character check
-            if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+            if (pwd.length >= 8) strength += 25;
+            if (/[A-Z]/.test(pwd)) strength += 25;
+            if (/[a-z]/.test(pwd)) strength += 25;
+            if (/[0-9]/.test(pwd)) strength += 25;
+            if (/[^A-Za-z0-9]/.test(pwd)) strength += 25;
             
-            // Determine strength level
+            strength = Math.min(strength, 100);
+            
             if (strength >= 75) {
                 text = 'Strong password';
                 color = '#38b000';
@@ -841,113 +827,150 @@
                 color = '#dc3545';
             }
             
-            // Update UI
             strengthFill.style.width = `${strength}%`;
-            strengthFill.style.background = color;
+            strengthFill.style.backgroundColor = color;
             strengthText.textContent = text;
             strengthText.style.color = color;
         });
         
-        // Password confirmation check
-        confirmPasswordInput.addEventListener('input', function() {
-            if (this.value !== passwordInput.value) {
-                passwordMatch.textContent = 'Passwords do not match';
+        // Password confirmation
+        confirmPassword.addEventListener('input', function() {
+            if (this.value !== password.value) {
+                passwordMatch.textContent = '✗ Passwords do not match';
                 passwordMatch.style.color = '#dc3545';
                 this.classList.add('is-invalid');
-                this.classList.remove('is-valid');
             } else {
-                passwordMatch.textContent = 'Passwords match';
+                passwordMatch.textContent = '✓ Passwords match';
                 passwordMatch.style.color = '#38b000';
                 this.classList.remove('is-invalid');
                 this.classList.add('is-valid');
             }
         });
         
-        // Form submission
+        // Form submission - NO USERNAME FIELD!
         registrationForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Validate form
-            if (!validateForm()) {
+            // Validation
+            if (!firstName.value || !lastName.value || !email.value || !phone.value || !password.value || !confirmPassword.value) {
+                showError('Please fill in all required fields');
                 return;
             }
             
+            if (!validateEmail(email.value)) {
+                showError('Please enter a valid email address');
+                return;
+            }
+            
+            if (!validatePhone(phone.value)) {
+                showError('Please enter a valid 9-digit phone number');
+                return;
+            }
+            
+            if (password.value !== confirmPassword.value) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            if (password.value.length < 8) {
+                showError('Password must be at least 8 characters long');
+                return;
+            }
+            
+            if (!termsCheckbox.checked) {
+                showError('You must agree to the Terms of Service');
+                return;
+            }
+            
+            // Prepare form data - NO USERNAME!
+            const formData = new FormData();
+            formData.append('first_name', firstName.value);
+            formData.append('last_name', lastName.value);
+            formData.append('email', email.value);
+            formData.append('phone', phone.value);
+            formData.append('country', document.getElementById('country').value);
+            formData.append('password', password.value);
+            formData.append('user_type', selectedRole);
+            
+            // Add role-specific fields
+            if (selectedRole === 'business_owner') {
+                const orgName = document.getElementById('organization_name')?.value;
+                const businessType = document.getElementById('business_type')?.value;
+                const position = document.getElementById('position')?.value;
+                const businessAddress = document.getElementById('business_address')?.value;
+                
+                if (orgName) formData.append('organization_name', orgName);
+                if (businessType) formData.append('business_type', businessType);
+                if (position) formData.append('position', position);
+                if (businessAddress) formData.append('business_address', businessAddress);
+            } else if (selectedRole === 'client') {
+                const idNumber = document.getElementById('id_number')?.value;
+                const address = document.getElementById('address')?.value;
+                
+                if (idNumber) formData.append('id_number', idNumber);
+                if (address) formData.append('address', address);
+            }
+            
+            // Add marketing preference
+            if (document.getElementById('marketing').checked) {
+                formData.append('receive_email_notifications', 'true');
+            }
+            
             // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating Account...';
             submitBtn.disabled = true;
             
-            // Show redirect notification
-            redirectNotification.style.display = 'block';
-            
-            // Simulate API call delay
-            setTimeout(() => {
-                // In real app, this would submit to Django backend
-                // For demo, we'll simulate success
-                
-                // Hide notification
-                redirectNotification.style.display = 'none';
-                
-                // Reset button
+            // Submit to backend
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess('Account created successfully! Redirecting to login...');
+                    setTimeout(() => {
+                        window.location.href = "{% url 'login' %}?role=" + selectedRole;
+                    }, 2000);
+                } else {
+                    showError(data.message || 'Registration failed. Please try again.');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Network error. Please check your connection.');
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
-                
-                // Show success message
-                showSuccess(`Account created successfully! You will be redirected to login.`);
-                
-                // Redirect to login after 2 seconds
-                setTimeout(() => {
-                    window.location.href = "{% url 'login' %}?role=" + selectedRole;
-                }, 2000);
-                
-            }, 3000);
+            });
         });
         
-        // Form validation
-        function validateForm() {
-            let isValid = true;
-            
-            // Check required fields
-            const requiredFields = registrationForm.querySelectorAll('[required]');
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    field.classList.add('is-invalid');
-                    isValid = false;
-                    
-                    // Scroll to first error
-                    if (isValid === false) {
-                        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        isValid = null; // Prevent multiple scrolls
-                    }
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-            
-            // Check password match
-            if (passwordInput.value !== confirmPasswordInput.value) {
-                confirmPasswordInput.classList.add('is-invalid');
-                isValid = false;
-            }
-            
-            // Check password strength
-            if (passwordInput.value.length < 8) {
-                passwordInput.classList.add('is-invalid');
-                isValid = false;
-            }
-            
-            // Check terms acceptance
-            const termsCheckbox = document.getElementById('terms');
-            if (!termsCheckbox.checked) {
-                termsCheckbox.classList.add('is-invalid');
-                isValid = false;
-            }
-            
-            return isValid;
+        // Helper functions
+        function validateEmail(email) {
+            return /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email);
         }
         
-        // Show success message
+        function validatePhone(phone) {
+            return /^[0-9]{9}$/.test(phone);
+        }
+        
+        function showError(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            registrationForm.prepend(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+        
         function showSuccess(message) {
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
@@ -957,42 +980,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
             registrationForm.prepend(alertDiv);
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 5000);
         }
-        
-        // Initialize
-        updateRequiredFields();
     });
 </script>
-
-<style>
-    .redirect-notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        border-radius: 10px;
-        padding: 15px 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        border-left: 4px solid var(--primary-color);
-        z-index: 9999;
-        display: none;
-        animation: slideInRight 0.5s ease;
-    }
-    
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(100px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-</style>
 {% endblock %}
